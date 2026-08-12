@@ -1,19 +1,18 @@
 # Wiki index
 
-Catalog of every page — one line each. Maintained on every ingest.
+Catalog of every page — one line each. Claude maintains this on every ingest.
 
 ## Concepts
-- [[spaced-repetition]] — reviewing at expanding intervals for durable memory
-- [[transformer-attention]] — query/key/value self-attention, the core of a Transformer
+_(none yet — write a source and run `/ingest`)_
 
 ## Projects
-- [[example-project]] — Second Brain CLI: notes → flashcards → FSRS schedule (active)
+_(none yet)_
 
 ## Papers
-- [[attention-is-all-you-need]] — Vaswani et al. 2017, the Transformer
+_(none yet)_
 
 ## Personal
-- [[learning-goals-2026]] — the year's learning priorities
+_(none yet)_
 
 ## Hubs
-- [[getting-started]] — map of this example wiki
+_(none yet)_

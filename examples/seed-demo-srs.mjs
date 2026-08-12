@@ -1,6 +1,6 @@
-// Generates the DEMO spaced-repetition data for the example vault:
-//   examples/vault/wiki/srs/cards.json   (the card bank)
-//   examples/vault/wiki/srs/reviews.jsonl (14-day review history)
+// Generates the DEMO spaced-repetition data for the demo vault:
+//   examples/demo-vault/wiki/srs/cards.json   (the card bank)
+//   examples/demo-vault/wiki/srs/reviews.jsonl (14-day review history)
 // so the web app's Recall dashboard renders with real-looking numbers out of the
 // box. It's deliberately time-anchored at BASE below — re-run it (optionally edit
 // BASE to today) to refresh the demo. Deterministic: no Math.random, no clock.
@@ -13,7 +13,7 @@ import { fileURLToPath } from "url";
 
 const BASE = "2026-08-11"; // the demo's "today"
 const here = path.dirname(fileURLToPath(import.meta.url));
-const SRS = path.join(here, "vault", "wiki", "srs");
+const SRS = path.join(here, "demo-vault", "wiki", "srs");
 
 const day = (offset) => {
   const [y, m, d] = BASE.split("-").map(Number);

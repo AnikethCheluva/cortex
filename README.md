@@ -50,20 +50,31 @@ npm install
 npm run dev            # → http://localhost:3000
 ```
 
-It runs on the bundled **example vault** (`examples/vault/`) out of the box —
-browse the demo wiki, tasks, daily notes, calendar, and recall dashboard.
+It runs on the bundled **empty starter vault** (`examples/vault/`) out of the box —
+the proper folder structure with just the starter files, ready to fill.
 
-## Use your own notes
+## Choose your vault
 
 The app finds your content via `VAULT_PATH` (the directory that holds `sources/`
-and `wiki/`). Two easy layouts:
+and `wiki/`). Pick one — a one-line helper writes it to `web/.env.local` for you:
 
-- **Sibling repo** — keep your notes in their own (private) repo next to this one:
-  ```bash
-  cd web && VAULT_PATH=../../my-wiki npm run dev
-  ```
-- **Drop-in** — put your own `sources/` and `wiki/` at the repo root; unset,
-  `VAULT_PATH` falls back to the parent of `web/`.
+**Option A — Use your own existing vault** (your Obsidian / LLM-wiki setup):
+```bash
+node scripts/use-vault.mjs /path/to/your/obsidian-vault
+cd web && npm run dev
+```
+Your vault just needs `sources/` and `wiki/` folders (see `CLAUDE.md` +
+`examples/vault/` for the layout). Or set `VAULT_PATH` yourself.
+
+**Option B — Start empty** (the default):
+```bash
+cd web && npm run dev        # runs on examples/vault, the empty starter
+```
+Then read [`examples/vault/README.md`](examples/vault/README.md) +
+[`CLAUDE.md`](CLAUDE.md) and start writing into `sources/`.
+
+> Want to see it populated first? There's a fully-worked fictional demo:
+> `node scripts/use-vault.mjs examples/demo-vault`.
 
 For write-back and deployment (committing edits from the app to GitHub), set
 `GITHUB_TOKEN` + `GITHUB_REPO` — see [`web/.env.example`](web/.env.example) and
@@ -72,22 +83,24 @@ For write-back and deployment (committing edits from the app to GitHub), set
 ## Repository layout
 
 ```
-web/            Next.js web app (the main interface) — see web/README.md
-clients/        Raycast extension + iOS Shortcuts
-tooling/        The Slack bot (setup + env; see tooling/slackbot/README.md)
-.claude/        Slash commands + instructions that drive Claude's wiki work
-examples/vault/ Fictional demo content (sources/ + wiki/) — replace with yours
-CLAUDE.md       The schema: how sources become the wiki (customize this)
+web/                 Next.js web app (the main interface) — see web/README.md
+clients/             Raycast extension + iOS Shortcuts
+tooling/             The Slack bot (setup + env; see tooling/slackbot/README.md)
+.claude/             Slash commands + instructions that drive Claude's wiki work
+examples/vault/      Empty STARTER vault — proper structure + starter files (the default)
+examples/demo-vault/ Fully-worked fictional demo (optional; safe to delete)
+scripts/use-vault.mjs  Point the app at your own vault, the demo, or the starter
+CLAUDE.md            The schema: how sources become the wiki (customize this)
 ```
 
-## Regenerate the demo recall data
+## The demo vault
 
-The example spaced-repetition history is time-anchored so the dashboard looks
-alive. Refresh it (optionally edit `BASE` to today) with:
-
-```bash
-node examples/seed-demo-srs.mjs
-```
+`examples/demo-vault/` is an optional, fully-worked fictional vault (a "Second
+Brain CLI" project, ML pages, tasks, daily notes, and a live recall dashboard) —
+handy for seeing every feature populated. View it with
+`node scripts/use-vault.mjs examples/demo-vault`, or delete it if you don't want
+it. Its spaced-repetition history is time-anchored; refresh it with
+`node examples/seed-demo-srs.mjs`.
 
 ## License
 
