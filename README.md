@@ -41,6 +41,65 @@ the op log. Every wiki claim traces back to a source file.
 | **Slack bot** (`tooling/slackbot/`) | A conversational front door: `/wiki <verb>` → headless Claude on the vault |
 | **Live mirror** (`web/convex/`) | Optional Convex mirror for real-time updates between deploys |
 
+## Features in depth
+
+Everything below is plain markdown + JSON in the vault — edited in a polished web
+UI, but always just files in git. All of it is visible in the demo vault
+(`node scripts/use-vault.mjs examples/demo-vault`).
+
+### 📅 Daily notes
+Dated notes at `sources/daily/YYYY-MM-DD.md` — the raw stream your wiki is built
+from.
+- **Today** opens today's note in a rich editor (headings, lists, checkboxes,
+  inline LaTeX) with a notebook-style page; **Daily** lists every past note with a
+  one-line summary.
+- **Jot from anywhere** — a quick note from Slack, Raycast, or an iOS Shortcut
+  appends to today's note and commits it.
+- On ingest, Claude reads your daily notes to create/enrich wiki pages, generates
+  recall cards from them, and writes each day's one-line summary.
+
+### 📝 Docs
+Google-Docs-style **persistent documents** for long-form writing that doesn't fit
+a dated note.
+- A formatting **toolbar** across the top (bold, headings, lists, quotes, code,
+  tables) over a blank, letter-sized page in the app's theme.
+- Rich text, inline **LaTeX** (`$e^{i\pi}+1=0$`), and images; autosaves back to
+  the repo as you type.
+- Each doc is a real wiki **source** at `sources/notes/<slug>.md`, so it gets
+  compiled into the wiki on the next ingest like any other note.
+
+### ✅ Tasks
+A **git-backed task board** — every task is a file at `wiki/tasks/<id>.md`.
+- Fields for **project, priority, status, due date**, and a `page_slug` link to
+  the task's wiki project page; projects are color-coded on the board.
+- Add, edit, and complete tasks from the web app, Slack, Raycast, or iOS
+  Shortcuts — edits commit straight to GitHub via the Contents API.
+- During ingest Claude keeps the board and your project pages in sync: open tasks
+  for a project's next steps, mark finished ones done.
+
+### 🗓️ Calendar
+A **Notion-Calendar-style** view of your real calendars plus the agent's plan.
+- Connect **Google Calendar** and/or **Outlook** with client-side OAuth — no
+  server secrets, tokens stay in the browser.
+- Sidebar mini-month with **day / week / month** views, and a dedicated **mobile
+  layout** for iPhone.
+- **"Planned" overlay** — during ingest Claude scopes your active projects' next
+  steps into dated deliverables in `wiki/calendar/planned.json`, drawn as a
+  distinct, **toggleable** layer so you see suggested timelines next to real
+  events (never mixed in).
+
+### 🧠 Recall (spaced repetition)
+Turns your notes into daily active-recall questions and tracks retention with
+**FSRS** — with **no API key in the web app**.
+- The grading and card-writing happen in the **ingest** (which *is* the LLM):
+  Claude generates atomic cards from what you wrote, grades the previous answers,
+  and the FSRS engine schedules each card. All state is git-backed in `wiki/srs/`.
+- **Today** shows the day's quiz; you answer, the app captures it, the next ingest
+  grades it and advances the schedule.
+- **Overview** shows a recall **dashboard**: true 30-day retention on graduated
+  cards, review streak, a stability histogram, a 14-day due forecast, confidence
+  calibration, and per-topic mastery.
+
 ## Quick start
 
 ```bash
