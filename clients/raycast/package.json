@@ -1,0 +1,76 @@
+{
+  "$schema": "https://www.raycast.com/schemas/extension.json",
+  "name": "llm-wiki",
+  "title": "LLM Wiki",
+  "description": "Capture notes and tasks into your git-backed wiki, and glance at today's status from the menu bar.",
+  "icon": "icon.png",
+  "author": "your-name",
+  "categories": ["Productivity", "Notes"],
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "jot",
+      "title": "Jot to Today",
+      "subtitle": "LLM Wiki",
+      "description": "Append a quick line to today's daily note.",
+      "mode": "view"
+    },
+    {
+      "name": "add-task",
+      "title": "Add Task",
+      "subtitle": "LLM Wiki",
+      "description": "Create a task on the wiki board.",
+      "mode": "view"
+    },
+    {
+      "name": "tasks",
+      "title": "Tasks",
+      "subtitle": "LLM Wiki",
+      "description": "Browse wiki tasks and update their status.",
+      "mode": "view"
+    },
+    {
+      "name": "overview",
+      "title": "Wiki Overview",
+      "subtitle": "LLM Wiki",
+      "description": "Streak, open tasks, and today's status in the menu bar.",
+      "mode": "menu-bar",
+      "interval": "30m"
+    }
+  ],
+  "preferences": [
+    {
+      "name": "baseUrl",
+      "title": "App URL",
+      "description": "Your deployed web app origin, e.g. https://llm-wiki.vercel.app",
+      "type": "textfield",
+      "required": true,
+      "placeholder": "https://llm-wiki.vercel.app"
+    },
+    {
+      "name": "apiToken",
+      "title": "API Token",
+      "description": "Optional. Only needed if API_TOKEN is set on the server (gates writes).",
+      "type": "password",
+      "required": false
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.80.0",
+    "@raycast/utils": "^1.17.0"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.11",
+    "@types/node": "^20.8.10",
+    "@types/react": "19.0.10",
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.4.5"
+  },
+  "scripts": {
+    "build": "ray build",
+    "dev": "ray develop",
+    "lint": "ray lint",
+    "fix-lint": "ray lint --fix"
+  }
+}

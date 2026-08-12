@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#14130d"/>
+  <g transform="rotate(60 256 256)" fill="none" stroke="#d8b15a" stroke-width="10" opacity="0.14">
+    <circle cx="256" cy="256" r="180"/>
+    <ellipse cx="256" cy="256" rx="63" ry="180"/>
+    <ellipse cx="256" cy="256" rx="126" ry="180"/>
+    <ellipse cx="256" cy="256" rx="180" ry="63"/>
+    <ellipse cx="256" cy="256" rx="180" ry="126"/>
+    <line x1="76" y1="256" x2="436" y2="256"/>
+    <line x1="256" y1="76" x2="256" y2="436"/>
+  </g>
+  <text x="256" y="256" text-anchor="middle" dominant-baseline="central"
+        font-family="'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, 'PT Serif', serif"
+        font-size="250" font-weight="700" fill="#d8b15a">A</text>
+</svg>

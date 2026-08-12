@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Next.js build output
+web/.next/
+web/out/
+*.tsbuildinfo
+
+# Env / secrets (never commit real values — copy the .example files)
+.env
+.env.local
+.env*.local
+web/.env
+web/.env.local
+web/.env*.local
+tooling/slackbot/.env
+
+# Python (Slack bot)
+**/.venv/
+**/__pycache__/
+*.pyc
+
+# Local Claude settings (per-machine permission grants)
+.claude/settings.local.json
+
+# Vercel / Convex local state
+.vercel/
+.convex/
+
+# OS
+.DS_Store

@@ -1,0 +1,40 @@
+{
+  "events": [
+    {
+      "id": "example-project-spec",
+      "title": "Second Brain CLI: spec finalized",
+      "date": "2026-08-12",
+      "allDay": true,
+      "project": "example-project",
+      "page_slug": "example-project",
+      "kind": "milestone",
+      "note": "Lock the CLI command surface + storage format",
+      "source": "sources/daily/2026-08-11.md",
+      "createdAt": "2026-08-11"
+    },
+    {
+      "id": "example-project-fsrs",
+      "title": "Second Brain CLI: FSRS scheduler working",
+      "date": "2026-08-15",
+      "allDay": true,
+      "project": "example-project",
+      "page_slug": "example-project",
+      "kind": "deliverable",
+      "note": "Cards advance through due/again/good states",
+      "source": "sources/daily/2026-08-11.md",
+      "createdAt": "2026-08-11"
+    },
+    {
+      "id": "example-project-benchmark",
+      "title": "Second Brain CLI: retention benchmark",
+      "date": "2026-08-22",
+      "allDay": true,
+      "project": "example-project",
+      "page_slug": "spaced-repetition",
+      "kind": "checkpoint",
+      "note": "Measure true 30-day retention on graduated cards",
+      "source": "sources/daily/2026-08-11.md",
+      "createdAt": "2026-08-11"
+    }
+  ]
+}
