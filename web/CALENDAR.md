@@ -63,6 +63,23 @@ NEXT_PUBLIC_MS_CLIENT_ID=00000000-0000-0000-0000-000000000000
 - **+ Event** creates on the chosen provider's primary calendar; click an event to
   open it in the provider or delete it.
 
+## Troubleshooting
+
+- **`Error 403: access_denied` (Google).** The OAuth consent screen is in
+  *testing* mode and the account you're signing in with isn't listed as a **Test
+  user**. Add it under *APIs & Services → OAuth consent screen → Test users*. (You
+  do **not** need to publish/verify the app for personal use.)
+- **`redirect_uri_mismatch` / `origin_mismatch`, or the popup closes instantly.**
+  The origin you opened isn't an **Authorized JavaScript origin**. It must match
+  **exactly** — same scheme + host, **no trailing slash** (`https://foo.vercel.app`,
+  not `https://foo.vercel.app/`). Add both your Vercel URL and
+  `http://localhost:3000`. Changes can take a few minutes to propagate.
+- **Nothing happens / the Connect button is missing.** `NEXT_PUBLIC_*` vars are
+  baked in at build time — set them in Vercel and **redeploy**. Locally, restart
+  `npm run dev` after editing `.env.local`.
+- **Blocked pop-up.** The provider sign-in opens a pop-up; allow pop-ups for your
+  app's origin.
+
 ## Notes
 
 - **Per-device sign-in.** Tokens are browser-local, so you authorize on each device.

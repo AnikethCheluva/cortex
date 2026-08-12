@@ -53,6 +53,12 @@ from.
 - **Today** opens today's note in a rich editor (headings, lists, checkboxes,
   inline LaTeX) with a notebook-style page; **Daily** lists every past note with a
   one-line summary.
+- **Voice notes** — dictate straight into a note instead of typing. On Chrome and
+  Safari (including iPhone) it uses the browser's on-device **Web Speech API** —
+  **free, no API key, and the audio never leaves your device**. An optional
+  OpenAI-compatible speech-to-text fallback (`STT_API_KEY`, e.g. OpenAI or Groq
+  Whisper) covers browsers without Web Speech; that audio is transcribed and
+  immediately discarded, never stored.
 - **Jot from anywhere** — a quick note from Slack, Raycast, or an iOS Shortcut
   appends to today's note and commits it.
 - On ingest, Claude reads your daily notes to create/enrich wiki pages, generates
@@ -138,6 +144,76 @@ Then read [`examples/vault/README.md`](examples/vault/README.md) +
 For write-back and deployment (committing edits from the app to GitHub), set
 `GITHUB_TOKEN` + `GITHUB_REPO` — see [`web/.env.example`](web/.env.example) and
 [`web/DEPLOY.md`](web/DEPLOY.md).
+
+## Setup & integrations
+
+Everything below is optional — the app works without any of it. Add the pieces you
+want.
+
+### 🗓️ Connect Google Calendar (and Outlook)
+
+The Calendar tab uses **client-side OAuth** — no server, no secret, no token
+database. You provide a **public** client ID and sign in per device. Quick version
+(full steps + Outlook in [`web/CALENDAR.md`](web/CALENDAR.md)):
+
+1. [Google Cloud Console](https://console.cloud.google.com/) → create/pick a project.
+2. **APIs & Services → Library** → enable the **Google Calendar API**.
+3. **OAuth consent screen** → *External* → add your Google account as a **Test user**
+   (keeps it in "testing" mode — fine for personal use, no verification needed).
+4. **Credentials → Create Credentials → OAuth client ID → Web application.** Under
+   **Authorized JavaScript origins** add your exact origin(s):
+   `https://<your-project>.vercel.app` and `http://localhost:3000`. *(No redirect
+   URI needed.)*
+5. Copy the Client ID and set it (Vercel → Environment Variables, then **redeploy**):
+   ```
+   NEXT_PUBLIC_GOOGLE_CLIENT_ID=…apps.googleusercontent.com
+   ```
+6. Open the **Calendar** tab → **Connect Google** → sign in and grant access.
+
+> **Getting `Error 403: access_denied`?** Your app is in *testing* mode and the
+> Google account you're signing in with isn't a **Test user** yet — add it under
+> *OAuth consent screen → Test users*. Also confirm the origin you're opening
+> matches an **Authorized JavaScript origin** exactly (same scheme + host, **no
+> trailing slash**). Changing origins? Google can take a few minutes to propagate.
+
+### 📱 Install on iPhone (home-screen web app — the "bookmark" method)
+
+The app is a PWA, so you can add it to your Home Screen as a full-screen app — no
+App Store, just a bookmark that behaves like a native app:
+
+1. Open your deployed URL (e.g. `https://<your-project>.vercel.app`) in **Safari**
+   on your iPhone. *(Must be Safari — Add to Home Screen lives there.)*
+2. Tap the **Share** button (the square with an up-arrow) → scroll down →
+   **Add to Home Screen**.
+3. Give it a name (e.g. "Wiki") → **Add**.
+
+It gets its own icon and launches **full-screen (standalone)** with the dark
+theme — no browser chrome, no tabs. For **one-tap capture** without even opening
+the app (Action Button, Back Tap, Lock Screen, Siri, Share Sheet), add the iOS
+Shortcuts in [`clients/shortcuts/`](clients/shortcuts/README.md).
+
+### 💬 Set up the Slack bot yourself
+
+A [Socket-Mode](https://api.slack.com/apis/socket-mode) Slack app turns
+`/wiki <verb>` and `@mentions` into a **headless Claude run on your vault**, then
+replies in Slack. Quick version (full walkthrough in
+[`tooling/slackbot/README.md`](tooling/slackbot/README.md)):
+
+1. Create a Slack app (https://api.slack.com/apps → *From scratch*).
+2. **Socket Mode: on** → generate an **App-Level Token** (`xapp-…`, scope
+   `connections:write`).
+3. **Bot Token Scopes**: `app_mentions:read`, `chat:write`, `commands`,
+   `channels:history`, `groups:history` → **Install to workspace** → copy the
+   **Bot Token** (`xoxb-…`).
+4. Add a **`/wiki` slash command** and subscribe to the **`app_mention`** event.
+5. Install [Claude Code](https://claude.com/claude-code) on a machine that stays
+   up (a server, a Pi) and sign in.
+6. `cp tooling/slackbot/.env.example tooling/slackbot/.env`, fill in the two tokens
+   + your `VAULT_PATH`, then run the bot and keep it alive (systemd / tmux).
+
+> The runtime handler is a documented placeholder — the contract is simply
+> "Slack event → `claude -p` in the vault → reply." Drop in your own Socket-Mode
+> script, or ask and it can be vendored.
 
 ## Repository layout
 
