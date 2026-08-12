@@ -3,13 +3,13 @@ import "./globals.css";
 import { ConvexClientProvider } from "./ConvexClientProvider";
 
 export const metadata: Metadata = {
-  title: "LLM Wiki",
-  description: "Web viewer for the LLM Wiki — pages, tasks, daily notes, and the op log.",
+  title: "Cortex",
+  description: "Web viewer for the Cortex — pages, tasks, daily notes, and the op log.",
   manifest: "/manifest.webmanifest",
   // Make "Add to Home Screen" on iOS open full-screen like a native app.
   appleWebApp: {
     capable: true,
-    title: "LLM Wiki",
+    title: "Cortex",
     statusBarStyle: "black-translucent",
   },
   // Belt-and-suspenders: the legacy Apple flag alongside Next's modern

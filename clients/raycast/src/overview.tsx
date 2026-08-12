@@ -33,7 +33,7 @@ export default function Command() {
     : undefined;
 
   return (
-    <MenuBarExtra icon="icon.png" title={title} isLoading={loading} tooltip="LLM Wiki">
+    <MenuBarExtra icon="icon.png" title={title} isLoading={loading} tooltip="Cortex">
       {err && (
         <MenuBarExtra.Item
           title={`Error: ${err}`}

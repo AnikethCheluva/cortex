@@ -1,4 +1,4 @@
-# LLM Wiki — web viewer
+# Cortex — web viewer
 
 A standalone Next.js web viewer for the wiki, living **inside the vault repo**
 (`web/`) but deployed **separately on Vercel**. It is unrelated to the Slack

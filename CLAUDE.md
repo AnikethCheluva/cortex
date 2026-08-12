@@ -1,4 +1,4 @@
-# CLAUDE.md — LLM Wiki
+# CLAUDE.md — Cortex
 
 The **schema** for Claude Code sessions in this vault. Read it at the start of every session.
 

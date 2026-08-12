@@ -7,7 +7,7 @@ updated: 2026-08-11
 ---
 
 Welcome — this is a **hub** page, the kind you use to navigate a topic. This
-example vault is fictional demo content shipped with the LLM Wiki skeleton so the
+example vault is fictional demo content shipped with the Cortex skeleton so the
 app has something to render. Replace it with your own.
 
 ## The map

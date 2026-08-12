@@ -1,4 +1,4 @@
-# LLM Wiki — Integration API
+# Cortex — Integration API
 
 A small HTTP API over the vault so **any frontend** (Raycast, iOS widgets /
 Shortcuts, a native app, `curl`) can read state and capture notes/tasks. Every

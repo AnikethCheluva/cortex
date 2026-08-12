@@ -92,7 +92,7 @@ export function Dashboard({ data }: { data: VaultData }) {
   return (
     <div className="wrap">
       <header className="app-header">
-        <div className="app-title">LLM Wiki</div>
+        <div className="app-title">Cortex</div>
         <div className="app-user">
           <button className="search-btn" onClick={() => setPaletteOpen(true)}>
             <span>Search</span>

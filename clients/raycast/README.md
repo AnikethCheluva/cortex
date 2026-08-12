@@ -1,4 +1,4 @@
-# LLM Wiki — Raycast extension
+# Cortex — Raycast extension
 
 Capture into the wiki and glance at its state without leaving the keyboard.
 A thin client over the web app's HTTP API (`web/API.md`); **git stays the source
@@ -26,7 +26,7 @@ npm run dev      # loads the extension into Raycast in development mode
 `npm run dev` registers the commands in Raycast and hot-reloads on save. On first
 run, Raycast prompts for the extension's **preferences**:
 
-- **App URL** — your deployed origin, e.g. `https://llm-wiki.vercel.app`
+- **App URL** — your deployed origin, e.g. `https://cortex.vercel.app`
   (or `http://localhost:3000` while developing the web app).
 - **API Token** — leave blank unless you've set `API_TOKEN` on the server; then
   paste the same value so writes authenticate. Reads work without it.
@@ -37,7 +37,7 @@ To keep it after development, run `npm run build` and Raycast imports it locally
 ## Tips
 
 - **Menu bar**: after the first run, *Wiki Overview* appears as a menu-bar item.
-  Toggle it in Raycast → Extensions → LLM Wiki → Wiki Overview.
+  Toggle it in Raycast → Extensions → Cortex → Wiki Overview.
 - **Hotkeys**: bind *Jot to Today* to a global hotkey (Raycast → Extensions →
   record a shortcut) for capture-from-anywhere.
 - The menu-bar dropdown has ⌘J (jot) and ⌘N (add task) shortcuts.

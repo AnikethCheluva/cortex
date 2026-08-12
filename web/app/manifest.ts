@@ -6,8 +6,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "LLM Wiki",
-    short_name: "Wiki",
+    name: "Cortex",
+    short_name: "Cortex",
     description: "Living wiki — pages, tasks, and daily notes.",
     start_url: "/",
     scope: "/",

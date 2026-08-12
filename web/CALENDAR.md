@@ -38,7 +38,7 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=…apps.googleusercontent.com
 Create a **SPA** app registration:
 
 1. [Azure Portal](https://portal.azure.com/) → **Microsoft Entra ID → App registrations → New registration**.
-2. Name it (e.g. `LLM Wiki Calendar`); **Supported account types**: *Accounts in
+2. Name it (e.g. `Cortex Calendar`); **Supported account types**: *Accounts in
    any org directory and personal Microsoft accounts* (covers work + outlook.com).
 3. **Redirect URI**: platform **Single-page application (SPA)** → add your origin(s):
    - `https://<your-project>.vercel.app`

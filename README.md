@@ -1,4 +1,4 @@
-# LLM Wiki
+# Cortex
 
 > *"Obsidian is the IDE, the LLM is the programmer, the wiki is the codebase."*
 
@@ -109,8 +109,8 @@ Turns your notes into daily active-recall questions and tracks retention with
 ## Quick start
 
 ```bash
-git clone <this-repo> llm-wiki
-cd llm-wiki/web
+git clone <this-repo> cortex
+cd cortex/web
 npm install
 npm run dev            # → http://localhost:3000
 ```
@@ -123,7 +123,7 @@ the proper folder structure with just the starter files, ready to fill.
 The app finds your content via `VAULT_PATH` (the directory that holds `sources/`
 and `wiki/`). Pick one — a one-line helper writes it to `web/.env.local` for you:
 
-**Option A — Use your own existing vault** (your Obsidian / LLM-wiki setup):
+**Option A — Use your own existing vault** (your Obsidian / Cortex setup):
 ```bash
 node scripts/use-vault.mjs /path/to/your/obsidian-vault
 cd web && npm run dev

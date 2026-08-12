@@ -5,7 +5,7 @@ import { join } from "path";
 // iOS home-screen icon (apple-touch-icon). Full-bleed + opaque, no self-applied
 // rounded corners/transparency, so iOS 26 applies its own Liquid Glass treatment
 // cleanly. A faint wireframe globe (tilted 60°) sits behind a centered "A.C." in
-// PT Serif (matching the "LLM Wiki" header) on the app's charcoal.
+// PT Serif (matching the "Cortex" header) on the app's charcoal.
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 

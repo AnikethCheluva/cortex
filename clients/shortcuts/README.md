@@ -1,4 +1,4 @@
-# LLM Wiki — iPhone Shortcuts
+# Cortex — iPhone Shortcuts
 
 Zero-code capture into the wiki from Siri, the Action Button, the Lock Screen,
 and the Share Sheet — built on the same HTTP API as everything else

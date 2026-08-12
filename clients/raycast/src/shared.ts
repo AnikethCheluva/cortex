@@ -1,4 +1,4 @@
-// Thin client over the LLM Wiki HTTP API (see web/API.md). Git is the source
+// Thin client over the Cortex HTTP API (see web/API.md). Git is the source
 // of truth; these calls read/commit the repo through the same endpoints the web
 // app uses. Reads are open; writes send the optional Bearer token when set.
 import { getPreferenceValues } from "@raycast/api";
