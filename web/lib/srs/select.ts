@@ -41,8 +41,16 @@ export function selectDaily(cards: Card[], opts: SelectOpts = {}): Card[] {
     // lowest retrievability = most in danger of being forgotten = review first
     .sort((a, b) => retrievability(a.srs, now) - retrievability(b.srs, now));
 
-  // New cards are bounded by maxNew AND never exceed the daily cap.
-  const newCards = fresh.slice(0, Math.min(maxNew, max));
-  const reviewSlots = Math.max(0, max - newCards.length);
+  // Reviews come FIRST, then new cards fill whatever's left (bounded by maxNew).
+  // This is deliberate backlog handling: a due card — something you already
+  // learned and are about to forget — matters more than new material. When you
+  // miss days, unanswered/overdue reviews pile up (they're never penalized; a
+  // skipped review just stays due and resurfaces here, most-at-risk first). By
+  // giving reviews the daily cap first, a backlog GATES new cards — introducing
+  // new material while you're behind only deepens the hole — and the introduction
+  // of new cards resumes automatically once you've caught up.
+  const reviewSlots = Math.min(due.length, max);
+  const newSlots = Math.min(maxNew, max - reviewSlots);
+  const newCards = fresh.slice(0, newSlots);
   return interleave([...due.slice(0, reviewSlots), ...newCards]);
 }
