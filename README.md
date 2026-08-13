@@ -44,11 +44,14 @@ links pages, flags contradictions, and updates the index. Every claim cites a so
 
 | Feature | What it does |
 |---|---|
-| **Daily notes + voice** | Dated notes with a rich editor. Dictate with the on-device Web Speech API — no key, no upload. |
+| **Daily notes** | Dated notes with a rich editor, checkboxes, and inline LaTeX. |
+| **Voice notes** | Dictate with the on-device Web Speech API — no key, no upload. |
 | **Recall** | Keyless FSRS. Claude writes cards from your notes and grades answers. A dashboard tracks true retention. |
 | **Calendar** | Google + Outlook via client-side OAuth. Plus a toggleable "Planned" overlay of project deliverables. |
-| **Wiki + Tasks** | Interlinked pages by type. A git-backed task board. |
-| **Docs + clients** | Google-Docs-style documents. Raycast, iOS Shortcuts, and a Slack bot. |
+| **Wiki** | Interlinked pages, one concept each, filed by type. |
+| **Tasks** | A git-backed task board with projects and priorities. |
+| **Docs** | Google-Docs-style long-form documents, saved as wiki sources. |
+| **Clients** | Raycast, iOS Shortcuts, and a Slack bot. |
 
 <table>
   <tr>
