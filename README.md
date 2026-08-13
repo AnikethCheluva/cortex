@@ -67,13 +67,30 @@ links pages, flags contradictions, and updates the index. Every claim cites a so
 Everything is markdown and JSON in git. The web UI edits the files. See it all
 populated with `node scripts/use-vault.mjs examples/demo-vault`.
 
-## Recall never loses a day
+## How recall works
 
-A skipped quiz is not a failure. Cortex never grades an unanswered card.
+Cortex turns your notes into active-recall flashcards and schedules each one for
+the moment just before you would forget it. This is spaced repetition, built in.
 
-- Miss a day → the cards stay due and come back, most-at-risk first.
-- Fall behind → reviews take priority. New cards wait until you catch up.
-- No ingest today → the app still builds a quiz from cards that are due now.
+**A card is made from your notes.** On each ingest, Claude reads what you wrote
+and writes atomic question-and-answer cards. Each card is one fact, grounded in a
+quote from the source.
+
+**You review on the Today tab.** The day's quiz shows one question at a time.
+Recall the answer, type it, then reveal the reference to check yourself. Rate how
+sure you were.
+
+**Grading needs no API key.** The app only captures your answer. The next ingest —
+which *is* the LLM — grades it against the card's reference answer.
+
+**FSRS picks the next date.** Each card carries a memory model (stability +
+difficulty). FSRS schedules the next review to hit a target recall probability,
+90% by default — the point where the review is hardest and sticks best. A card you
+skip is never penalized. It stays due and comes back, most-at-risk first.
+
+**The dashboard tracks retention.** The Overview tab shows true 30-day retention on
+graduated cards, your review streak, a due forecast, memory-stability spread, and
+confidence calibration.
 
 ## Setup
 
