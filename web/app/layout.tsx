@@ -4,7 +4,7 @@ import { ConvexClientProvider } from "./ConvexClientProvider";
 
 export const metadata: Metadata = {
   title: "Cortex",
-  description: "Web viewer for the Cortex — pages, tasks, daily notes, and the op log.",
+  description: "A second brain for your notes.",
   manifest: "/manifest.webmanifest",
   // Make "Add to Home Screen" on iOS open full-screen like a native app.
   appleWebApp: {

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/social-preview.png" alt="Cortex — your notes, compiled into a living wiki by an LLM" width="820">
+  <img src="docs/images/social-preview.png" alt="Cortex — a second brain for your notes" width="820">
 </p>
 
 <p align="center">

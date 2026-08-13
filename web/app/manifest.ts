@@ -8,7 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
     id: "/",
     name: "Cortex",
     short_name: "Cortex",
-    description: "Living wiki — pages, tasks, and daily notes.",
+    description: "A second brain for your notes.",
     start_url: "/",
     scope: "/",
     display: "standalone",
