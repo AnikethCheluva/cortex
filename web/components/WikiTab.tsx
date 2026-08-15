@@ -109,6 +109,9 @@ function WikiIndex({
   setActiveTag: (t: string | null) => void;
 }) {
   const filtering = query.trim().length > 0 || activeTag !== null;
+  // "curated" = grouped into type-tag folders; "all" = a flat A–Z index of every
+  // page, so you can surf everything regardless of how it's tagged.
+  const [view, setView] = useState<"curated" | "all">("curated");
 
   const filtered = useMemo(() => {
     const terms = query.trim().toLowerCase().split(/\s+/).filter(Boolean);
@@ -141,7 +144,25 @@ function WikiIndex({
 
   return (
     <div>
-      <h2 className="section">Living Wiki</h2>
+      <div className="wiki-head">
+        <h2 className="section" style={{ margin: 0 }}>
+          Living Wiki
+        </h2>
+        <div className="wiki-view-toggle" role="tablist" aria-label="Wiki view">
+          <button
+            className={`seg ${view === "curated" ? "active" : ""}`}
+            onClick={() => setView("curated")}
+          >
+            Curated
+          </button>
+          <button
+            className={`seg ${view === "all" ? "active" : ""}`}
+            onClick={() => setView("all")}
+          >
+            All pages
+          </button>
+        </div>
+      </div>
       <div className="wiki-search">
         <input
           className="wiki-search-input"
@@ -171,6 +192,8 @@ function WikiIndex({
             ))}
           </>
         )
+      ) : view === "all" ? (
+        <AllPages pages={pages} setSlug={setSlug} />
       ) : (
         folders.map(({ folder, pages: fp }) => {
           const isOpen = open[folder.key] ?? true;
@@ -196,6 +219,36 @@ function WikiIndex({
         })
       )}
     </div>
+  );
+}
+
+// Flat A–Z index of every page — browse the whole wiki, tag-agnostic.
+function AllPages({ pages, setSlug }: { pages: WikiPage[]; setSlug: (s: string) => void }) {
+  const groups = useMemo(() => {
+    const sorted = [...pages].sort((a, b) => a.title.localeCompare(b.title));
+    const m = new Map<string, WikiPage[]>();
+    for (const p of sorted) {
+      const first = (p.title.trim()[0] ?? "#").toUpperCase();
+      const key = /[A-Z]/.test(first) ? first : "#";
+      (m.get(key) ?? m.set(key, []).get(key)!).push(p);
+    }
+    return [...m.entries()];
+  }, [pages]);
+
+  return (
+    <>
+      <div className="muted" style={{ marginBottom: 8 }}>
+        {pages.length} pages · A–Z
+      </div>
+      {groups.map(([letter, ps]) => (
+        <div key={letter} className="alpha-group">
+          <div className="alpha-head">{letter}</div>
+          {ps.map((p) => (
+            <PageCard key={p.slug} page={p} onOpen={() => setSlug(p.slug)} />
+          ))}
+        </div>
+      ))}
+    </>
   );
 }
 

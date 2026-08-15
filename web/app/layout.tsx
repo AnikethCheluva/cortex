@@ -27,11 +27,18 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
+// Apply the saved theme before first paint, so switching away from the default
+// doesn't flash the default palette on every load. Mirrors lib/settings.ts.
+const THEME_BOOT = `(function(){try{var s=localStorage.getItem('cortex:settings');if(!s)return;var t=JSON.parse(s).theme;if(t&&t!=='notebook')document.documentElement.setAttribute('data-theme',t);}catch(e){}})()`;
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
+      </head>
       <body>
         <ConvexClientProvider>{children}</ConvexClientProvider>
       </body>

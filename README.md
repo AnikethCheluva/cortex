@@ -51,6 +51,10 @@ links pages, flags contradictions, and updates the index. Every claim cites a so
 | **Wiki** | Interlinked pages, one concept each, filed by type. |
 | **Tasks** | A git-backed task board with projects and priorities. |
 | **Docs** | Google-Docs-style long-form documents, saved as wiki sources. |
+| **Notion import** | Pull Notion pages and databases in as markdown sources. |
+| **Themes** | Six palettes, including a light one. Switch from the header. |
+| **Customizable** | Reorder or hide tabs, and arrange the Overview widget board. |
+| **Login** | Optional password gate, enforced on writes as well as the UI. |
 | **Clients** | Raycast, iOS Shortcuts, and a Slack bot. |
 
 <table>
@@ -92,9 +96,46 @@ skip is never penalized. It stays due and comes back, most-at-risk first.
 graduated cards, your review streak, a due forecast, memory-stability spread, and
 confidence calibration.
 
+## Make it yours
+
+Open **Settings** (the gear, top right). Everything is saved per browser and
+never touches the repo.
+
+- **Theme** — six palettes (Notebook, Midnight, Graphite, Forest, Plum, and the
+  light Parchment). Switch from the header or Settings → Appearance.
+- **Tabs** — reorder the nav, or hide tabs you never open.
+- **Overview widgets** — reorder, hide, and add widgets: streak, tasks, today's
+  note, knowledge base, upcoming deliverables, recent docs, activity, recall.
+  Pick 2 or 3 cards per row.
+
 ## Setup
 
 Everything below is optional. The app works without it.
+
+### Require a login
+
+Set one environment variable:
+
+```
+APP_PASSWORD=your-password
+```
+
+The app then opens on a sign-in screen. The session is a stateless HMAC in an
+httpOnly cookie, and the **write API enforces it server-side** — so it gates real
+access, not just the interface. Leave it unset and the app opens with no login.
+
+### Import from Notion
+
+Settings → **Notion import** pulls Notion pages and databases into
+`sources/notion/` as markdown, so the next `/ingest` compiles them into the wiki
+like any other source.
+
+1. Create an internal integration at [notion.so/my-integrations](https://www.notion.so/my-integrations) and copy the secret.
+2. In Notion, open a page → **⋯ → Connections →** your integration. It only sees pages shared with it.
+3. Paste the secret in Settings, load your pages, tick what you want, import.
+
+The secret stays in your browser and is passed per request — never committed,
+never stored on the server.
 
 ### Google Calendar
 

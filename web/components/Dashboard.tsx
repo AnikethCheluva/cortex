@@ -12,6 +12,8 @@ import { LogTab } from "./LogTab";
 import dynamic from "next/dynamic";
 import { CommandPalette } from "./CommandPalette";
 import { useLiveVault } from "./LiveVault";
+import { ThemeMenu } from "./ThemeMenu";
+import { TAB_LABEL, useSettings, type TabKey } from "@/lib/settings";
 
 // Calendar pulls in the OAuth SDKs (MSAL + Google GIS) — load it only when the
 // tab is opened so it stays out of the initial bundle.
@@ -27,19 +29,14 @@ const NotesTab = dynamic(() => import("./NotesTab").then((m) => m.NotesTab), {
   loading: () => <div className="muted" style={{ padding: 24 }}>Loading documents…</div>,
 });
 
-type Tab = "overview" | "today" | "daily" | "docs" | "calendar" | "wiki" | "tasks" | "log";
-type Focus = { id: string; n: number } | null;
+// Settings is rarely the first thing opened — keep it out of the initial bundle.
+const SettingsTab = dynamic(() => import("./SettingsTab").then((m) => m.SettingsTab), {
+  ssr: false,
+  loading: () => <div className="muted" style={{ padding: 24 }}>Loading settings…</div>,
+});
 
-const TABS: { key: Tab; label: string }[] = [
-  { key: "overview", label: "Overview" },
-  { key: "today", label: "Today" },
-  { key: "daily", label: "Daily" },
-  { key: "docs", label: "Docs" },
-  { key: "calendar", label: "Calendar" },
-  { key: "wiki", label: "Wiki" },
-  { key: "tasks", label: "Tasks" },
-  { key: "log", label: "Activity" },
-];
+type Tab = TabKey | "settings";
+type Focus = { id: string; n: number } | null;
 
 export function Dashboard({ data }: { data: VaultData }) {
   // Prefer the live Convex mirror when configured; fall back to build-time data.
@@ -48,12 +45,21 @@ export function Dashboard({ data }: { data: VaultData }) {
   // when its last sync is newer than this build, else the build-time data. Keeps
   // the app fresh even if the mirror lags (infrequent cron) or is disabled.
   const vault = live && (live.builtAt ?? "") > (data.builtAt ?? "") ? live : data;
+  const settings = useSettings();
   const [tab, setTab] = useState<Tab>("overview");
   const [wikiSlug, setWikiSlug] = useState<string | null>(null);
   const [dailyFocus, setDailyFocus] = useState<Focus>(null);
   const [taskFocus, setTaskFocus] = useState<Focus>(null);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const nav = useRef(0);
+
+  // The visible nav, in the user's order (Settings → Tabs).
+  const tabs = settings.tabOrder.filter((t) => !settings.hiddenTabs.includes(t));
+
+  // If the open tab gets hidden from the nav, fall back to Overview.
+  useEffect(() => {
+    if (tab !== "settings" && !tabs.includes(tab as TabKey)) setTab("overview");
+  }, [tabs, tab]);
 
   const openWiki = useCallback((slug: string) => {
     setWikiSlug(slug);
@@ -94,23 +100,33 @@ export function Dashboard({ data }: { data: VaultData }) {
       <header className="app-header">
         <div className="app-title">Cortex</div>
         <div className="app-user">
+          <ThemeMenu onOpenSettings={() => setTab("settings")} />
           <button className="search-btn" onClick={() => setPaletteOpen(true)}>
             <span>Search</span>
             <kbd>⌘K</kbd>
+          </button>
+          <button
+            className={`hdr-btn icon-only ${tab === "settings" ? "active" : ""}`}
+            onClick={() => setTab("settings")}
+            title="Settings"
+            aria-label="Settings"
+          >
+            ⚙
           </button>
         </div>
       </header>
 
       <nav className="tabs">
-        {TABS.map((t) => (
+        {tabs.map((t) => (
           <button
-            key={t.key}
-            className={`tab ${tab === t.key ? "active" : ""}`}
-            onClick={() => setTab(t.key)}
+            key={t}
+            className={`tab ${tab === t ? "active" : ""}`}
+            onClick={() => setTab(t)}
           >
-            {t.label}
+            {TAB_LABEL[t]}
           </button>
         ))}
+        {tab === "settings" && <button className="tab active">Settings</button>}
       </nav>
 
       {tab === "overview" && (
@@ -127,6 +143,7 @@ export function Dashboard({ data }: { data: VaultData }) {
         <TasksTab tasks={vault.tasks} openWiki={openWiki} focus={taskFocus} />
       )}
       {tab === "log" && <LogTab entries={vault.log} />}
+      {tab === "settings" && <SettingsTab />}
 
       <CommandPalette
         data={vault}

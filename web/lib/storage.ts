@@ -23,7 +23,13 @@ export function usingGitHub(): boolean {
 }
 
 // Only these path prefixes may ever be written.
-const WRITABLE = ["sources/daily/", "sources/notes/", "wiki/tasks/", "wiki/srs/"];
+const WRITABLE = [
+  "sources/daily/",
+  "sources/notes/",
+  "sources/notion/", // imported Notion pages (raw captures — still sources)
+  "wiki/tasks/",
+  "wiki/srs/",
+];
 
 function assertWritable(relPath: string) {
   const clean = relPath.replace(/\\/g, "/");

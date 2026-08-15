@@ -1,23 +1,34 @@
-// Optional shared-secret gate for the write/action API so *any* external
-// frontend (Raycast, an iOS widget/Shortcut, a native app, curl) can integrate
-// safely. Honest scope: the web app is a public browser SPA with no login, so
-// its own endpoints are inherently reachable by anyone who loads the site — this
-// token is NOT user auth. What it does: when API_TOKEN is set, an external
-// (cross-origin / non-browser) writer must present it, while the site's own
-// same-origin browser requests keep working without it. It stops casual/
-// accidental external writes, not a determined attacker.
+// Gate for the write/action API. Two independent mechanisms:
+//
+//   • APP_PASSWORD (login) — a real user gate. When set, the site requires a
+//     sign-in and every write must carry a valid session cookie (or an explicit
+//     API_TOKEN, for headless clients like Raycast/Shortcuts). See lib/auth.ts.
+//   • API_TOKEN — a shared secret so *external* frontends can integrate. On its
+//     own it is NOT user auth: with no APP_PASSWORD the site is a public SPA, so
+//     same-origin browser writes are allowed through and the token only stops
+//     casual/accidental external writes.
 //
 // Applied to WRITE methods only (POST/PUT/PATCH/DELETE); GET reads stay open so
 // widgets can pull freely and the browser's GETs (which don't send Origin) work.
+import { authEnabled, hasSession } from "./auth";
+
+function tokenPresented(req: Request, token: string): boolean {
+  if (!token) return false;
+  if ((req.headers.get("authorization") || "") === `Bearer ${token}`) return true;
+  return req.headers.get("x-api-token") === token;
+}
 
 export function apiAuthorized(req: Request): boolean {
   const token = process.env.API_TOKEN || "";
-  if (!token) return true; // unconfigured → open (preserves current behavior)
+
+  // Login configured → a signed-in browser, or a headless client with the
+  // shared secret. Being same-origin is NOT enough; that is the whole point.
+  if (authEnabled()) return hasSession(req) || tokenPresented(req, token);
+
+  if (!token) return true; // no login, no token → open (local/demo default)
 
   // 1) explicit token from an external client
-  const auth = req.headers.get("authorization") || "";
-  if (auth === `Bearer ${token}`) return true;
-  if (req.headers.get("x-api-token") === token) return true;
+  if (tokenPresented(req, token)) return true;
 
   // 2) same-origin browser request (the web app). Browsers send an Origin
   //    header on non-GET fetches; match it to this deployment's host.
@@ -35,5 +46,7 @@ export function apiAuthorized(req: Request): boolean {
 
 /** Standard 401 body when a write is rejected. */
 export function unauthorized() {
-  return { error: "unauthorized — send Authorization: Bearer <API_TOKEN>" };
+  return authEnabled()
+    ? { error: "unauthorized — sign in, or send Authorization: Bearer <API_TOKEN>" }
+    : { error: "unauthorized — send Authorization: Bearer <API_TOKEN>" };
 }
