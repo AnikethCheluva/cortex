@@ -3262,77 +3262,11 @@ h3.sub {
   font-size: 14px;
   line-height: 1;
 }
-.theme-dot {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
-}
-.theme-menu {
-  position: relative;
-}
-.menu-pop {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 6px);
-  z-index: 60;
-  min-width: 232px;
-  padding: 6px;
-  background: var(--panel);
-  border: 1px solid var(--rule-strong);
-  border-radius: 10px;
-  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.42);
-}
-.menu-head {
-  padding: 6px 10px 8px;
-  font-size: 10.5px;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--faint);
-}
-.menu-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 7px 10px;
-  border: none;
-  border-radius: 7px;
-  background: none;
-  color: var(--fg-soft);
-  font-size: 13px;
-  font-family: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-.menu-item:hover {
-  background: var(--panel-2);
-  color: var(--fg);
-}
-.menu-item.active .menu-label {
-  color: var(--accent);
-}
-.menu-label {
-  flex: 1;
-}
-.menu-check {
-  color: var(--accent);
-}
-.menu-sep {
-  height: 1px;
-  margin: 6px 4px;
-  background: var(--rule);
-}
-.menu-swatch,
 .theme-swatch {
   display: inline-flex;
   border-radius: 5px;
   overflow: hidden;
   box-shadow: inset 0 0 0 1px var(--rule-strong);
-}
-.menu-swatch span {
-  width: 12px;
-  height: 18px;
 }
 .theme-swatch span {
   width: 20px;

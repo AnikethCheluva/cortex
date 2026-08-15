@@ -12,7 +12,6 @@ import { LogTab } from "./LogTab";
 import dynamic from "next/dynamic";
 import { CommandPalette } from "./CommandPalette";
 import { useLiveVault } from "./LiveVault";
-import { ThemeMenu } from "./ThemeMenu";
 import { TAB_LABEL, useSettings, type TabKey } from "@/lib/settings";
 
 // Calendar pulls in the OAuth SDKs (MSAL + Google GIS) — load it only when the
@@ -100,7 +99,6 @@ export function Dashboard({ data }: { data: VaultData }) {
       <header className="app-header">
         <div className="app-title">Cortex</div>
         <div className="app-user">
-          <ThemeMenu onOpenSettings={() => setTab("settings")} />
           <button className="search-btn" onClick={() => setPaletteOpen(true)}>
             <span>Search</span>
             <kbd>⌘K</kbd>
