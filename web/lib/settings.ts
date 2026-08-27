@@ -19,7 +19,13 @@ export type ThemeId =
   | "graphite"
   | "forest"
   | "plum"
-  | "parchment";
+  | "ocean"
+  | "ember"
+  | "nord"
+  | "mono"
+  | "parchment"
+  | "sepia"
+  | "daylight";
 
 export type ThemeDef = {
   id: ThemeId;
@@ -67,10 +73,52 @@ export const THEMES: ThemeDef[] = [
     dark: true,
   },
   {
+    id: "ocean",
+    label: "Ocean",
+    hint: "Deep teal with a cyan accent",
+    swatch: ["#071316", "#10272d", "#4fc3d9"],
+    dark: true,
+  },
+  {
+    id: "ember",
+    label: "Ember",
+    hint: "Warm dark with a burnt-orange accent",
+    swatch: ["#17100d", "#291e17", "#ff8c5a"],
+    dark: true,
+  },
+  {
+    id: "nord",
+    label: "Nord",
+    hint: "Cool blue-grey, low contrast",
+    swatch: ["#2e3440", "#434c5e", "#88c0d0"],
+    dark: true,
+  },
+  {
+    id: "mono",
+    label: "Mono",
+    hint: "Pure greyscale, maximum contrast",
+    swatch: ["#0a0a0a", "#1d1d1d", "#ffffff"],
+    dark: true,
+  },
+  {
     id: "parchment",
     label: "Parchment",
     hint: "Light cream paper with ink-brown type",
     swatch: ["#f4efe2", "#fbf8f0", "#8a6a2f"],
+    dark: false,
+  },
+  {
+    id: "sepia",
+    label: "Sepia",
+    hint: "Aged paper, warm brown ink",
+    swatch: ["#f1e7d5", "#f8f1e3", "#9c5f24"],
+    dark: false,
+  },
+  {
+    id: "daylight",
+    label: "Daylight",
+    hint: "Crisp white with a clear blue accent",
+    swatch: ["#f6f7f9", "#ffffff", "#2f6fd0"],
     dark: false,
   },
 ];
