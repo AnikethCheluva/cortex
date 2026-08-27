@@ -3884,3 +3884,60 @@ h3.sub {
     padding-top: 0;
   }
 }
+
+/* ======================================================================
+   Milkdown / Crepe — follow the app theme
+   The imported crepe-dark stylesheet hardcodes its palette on `.milkdown`
+   (editor chrome, slash + heading menus, the LaTeX pad, inline-equation
+   chips). Re-map every one of its variables onto our tokens so the editor
+   recolors with the theme instead of staying brass-on-brown. `.milkdown
+   .milkdown` doubles specificity so this wins regardless of import order.
+   ====================================================================== */
+:root,
+.milkdown.milkdown {
+  --crepe-color-background: transparent; /* keep the ruled paper showing through */
+  --crepe-color-on-background: var(--fg);
+  --crepe-color-surface: var(--panel);      /* menus + the LaTeX pad */
+  --crepe-color-surface-low: var(--panel-2);
+  --crepe-color-on-surface: var(--fg);
+  --crepe-color-on-surface-variant: var(--muted);
+  --crepe-color-outline: var(--rule-strong);
+  --crepe-color-primary: var(--accent);
+  --crepe-color-secondary: var(--accent-soft);
+  --crepe-color-on-secondary: var(--accent);
+  --crepe-color-inverse: var(--fg);
+  --crepe-color-on-inverse: var(--bg);
+  --crepe-color-inline-code: var(--accent);
+  --crepe-color-error: var(--err);
+  --crepe-color-hover: var(--panel-2);
+  --crepe-color-selected: var(--accent-soft);
+  --crepe-color-inline-area: var(--panel-2);
+
+  --crepe-font-title: var(--serif);
+  --crepe-font-default: var(--font);
+  --crepe-font-code: var(--mono);
+
+  /* crepe-dark ships WHITE shadows, which glow oddly on light themes */
+  --crepe-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px 1px rgba(0, 0, 0, 0.15);
+  --crepe-shadow-2: 0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* KaTeX inherits the surrounding text color rather than crepe's own */
+.milkdown .katex,
+.markdown .katex {
+  color: inherit;
+}
+
+
+/* Header wordmark + logo. The mark draws in currentColor, and the title sets
+   that to the theme accent — so the logo recolors with every theme. */
+.app-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.cortex-mark {
+  color: var(--accent);
+  flex: none;
+  margin-bottom: -2px;
+}
