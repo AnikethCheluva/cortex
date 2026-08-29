@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { splitDayNote, combineDayNote, VOICE_MARKER, QUIZ_MARKER } from "@/lib/daynote";
+import {
+  splitDayNote,
+  combineDayNote,
+  mergeDayNote,
+  VOICE_MARKER,
+  QUIZ_MARKER,
+} from "@/lib/daynote";
 
 describe("splitDayNote", () => {
   it("treats everything as written when there's no marker", () => {
@@ -80,5 +86,38 @@ describe("quiz section", () => {
     const out = combineDayNote("W", ["v"], quiz);
     const p = splitDayNote(out);
     expect(p).toEqual({ written: "W", voice: ["v"], quiz });
+  });
+});
+
+describe("mergeDayNote — the quiz block is server-managed", () => {
+  const QUIZ = `${QUIZ_MARKER}\n## Recall quiz — Friday\n<!-- ids: a,b -->\n\n1. What is a policy?`;
+  const onDisk = `Morning thoughts.\n\n${QUIZ}`;
+
+  it("keeps the existing quiz when the client sends a body without one", () => {
+    // The exact 8-28-26 regression: a tab loaded before the morning routine
+    // ran saves a body with no quiz block, clobbering the day's questions.
+    const merged = mergeDayNote("Egoverse 2.0 plan", onDisk);
+    expect(merged).toContain(QUIZ_MARKER);
+    expect(merged).toContain("What is a policy?");
+    expect(merged).toContain("Egoverse 2.0 plan");
+    expect(merged).not.toContain("Morning thoughts");
+  });
+
+  it("prefers the client's quiz when it round-tripped one", () => {
+    const fresh = `${QUIZ_MARKER}\n## Recall quiz — Saturday\n<!-- ids: c -->\n\n1. Newer?`;
+    const merged = mergeDayNote(`Notes.\n\n${fresh}`, onDisk);
+    expect(merged).toContain("Newer?");
+    expect(merged).not.toContain("What is a policy?");
+  });
+
+  it("preserves voice notes alongside a recovered quiz", () => {
+    const incoming = `Wrote things.\n\n${VOICE_MARKER}\n## Voice notes\n\n- spoken idea`;
+    const merged = mergeDayNote(incoming, onDisk);
+    expect(merged).toContain("- spoken idea");
+    expect(merged).toContain(QUIZ_MARKER);
+  });
+
+  it("is a no-op when neither side has a quiz", () => {
+    expect(mergeDayNote("just text", "older text")).toBe("just text\n");
   });
 });

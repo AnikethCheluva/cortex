@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import matter from "gray-matter";
 import { readVaultFile, writeVaultFile } from "@/lib/storage";
+import { mergeDayNote } from "@/lib/daynote";
 import { todayStem, todayISO, prettyISO } from "@/lib/day";
 import { apiAuthorized, unauthorized } from "@/lib/apiauth";
 
@@ -74,6 +75,9 @@ export async function PUT(
     const rel = relFor(stem);
 
     const existing = await readVaultFile(rel);
+    // Never let a stale client drop the server-managed recall-quiz block.
+    const priorBody = existing ? matter(existing.content).content : "";
+    const merged = mergeDayNote(text, priorBody);
     const created = stem === todayStem() ? todayISO() : iso;
     let content: string;
     if (existing) {
@@ -81,10 +85,10 @@ export async function PUT(
       content =
         (fm ? fm[1] : `---\ntype: daily\nCreated: ${created}\n---\n`) +
         "\n" +
-        text.replace(/\s+$/, "") +
+        merged.replace(/\s+$/, "") +
         "\n";
     } else {
-      content = `---\ntype: daily\nCreated: ${created}\n---\n\n${text.replace(
+      content = `---\ntype: daily\nCreated: ${created}\n---\n\n${merged.replace(
         /\s+$/,
         "",
       )}\n`;

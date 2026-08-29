@@ -54,3 +54,18 @@ export function combineDayNote(written: string, voice: string[], quiz = ""): str
 
   return out ? out + "\n" : "";
 }
+
+/** Merge an incoming edit with the note already on disk.
+ *
+ *  The quiz block is SERVER-managed: the morning ingest writes it, and the
+ *  browser is only expected to hand it back untouched. A client can always be
+ *  stale though — a tab opened before the ingest ran, a second device, a jot
+ *  from Raycast — and a body without a quiz block used to overwrite the file
+ *  and destroy the day's questions. So the file wins when the client didn't
+ *  send one: only an incoming quiz can replace the stored quiz, never absence.
+ */
+export function mergeDayNote(incomingBody: string, existingBody: string): string {
+  const incoming = splitDayNote(incomingBody ?? "");
+  const stored = splitDayNote(existingBody ?? "");
+  return combineDayNote(incoming.written, incoming.voice, incoming.quiz || stored.quiz);
+}
