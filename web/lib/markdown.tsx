@@ -2,11 +2,17 @@
 
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 
 /**
  * Render vault markdown. Turns Obsidian-style [[slug]] / [[slug|label]] links
  * into in-app navigation. Source back-links like [[../../sources/foo]] are
  * shown as plain text (they point outside the wiki page set).
+ *
+ * Math renders with KaTeX — `$inline$` and `$$block$$` — matching the note and
+ * doc editors, so an equation looks the same wherever you read it.
  */
 export function Markdown({
   body,
@@ -32,7 +38,8 @@ export function Markdown({
   return (
     <div className="markdown">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
+        remarkPlugins={[remarkGfm, remarkMath]}
+        rehypePlugins={[rehypeKatex]}
         components={{
           a({ href, children }) {
             if (href && href.startsWith("wiki:")) {
