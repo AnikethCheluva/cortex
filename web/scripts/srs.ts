@@ -17,13 +17,12 @@ import { applyReview } from "../lib/srs/schedule";
 import { selectDaily } from "../lib/srs/select";
 import { ratingFromVerdict } from "../lib/srs/grade";
 import { buildCard, isDuplicate, passedGate, type Candidate, type Anno } from "../lib/srs/generate";
-import { renderQuizSection } from "../lib/srs/daysection";
+import { renderQuizSection, parseQuizIds } from "../lib/srs/daysection";
 import { splitDayNote, combineDayNote } from "../lib/daynote";
-import { todayStem, todayISO, prettyISO } from "../lib/day";
+import { todayStem, todayISO, prettyISO, dailyDate } from "../lib/day";
 import type { CardBank, Review, Submission, Verdict } from "../lib/srs/types";
 
-import { VAULT_ROOT as ROOT } from "../lib/vaultroot";
-
+const ROOT = process.env.VAULT_PATH || path.resolve(process.cwd(), "..");
 const DAILY_CAP = Number(process.env.QUIZ_DAILY_CAP || "20");
 const abs = (rel: string) => path.join(ROOT, rel);
 
@@ -55,6 +54,29 @@ function parseJsonl<T>(text: string | null): T[] {
 
 type NewCardInput = Candidate & { source_file: string; topic: string; verification: Anno };
 type GradeInput = { card_id: string; submission_ts?: string; verdict: Verdict };
+
+/** The card ids served on the most recent earlier day that had a quiz. */
+async function previousQuizIds(todayStemStr: string): Promise<string[]> {
+  try {
+    const dir = path.join(ROOT, "sources", "daily");
+    const stems = (await fs.readdir(dir))
+      .filter((f) => f.toLowerCase().endsWith(".md"))
+      .map((f) => f.replace(/\.md$/i, ""));
+    const dated = stems
+      .map((s) => ({ s, iso: dailyDate(s).iso }))
+      .filter((x) => x.iso && x.s !== todayStemStr)
+      .sort((a, b) => b.iso.localeCompare(a.iso));
+    for (const { s } of dated.slice(0, 3)) {
+      const raw = await readText(`sources/daily/${s}.md`);
+      if (!raw) continue;
+      const ids = parseQuizIds(splitDayNote(matter(raw).content).quiz);
+      if (ids.length) return ids;
+    }
+  } catch {
+    /* no history is fine — nothing to avoid */
+  }
+  return [];
+}
 
 async function main() {
   const nowISO = new Date().toISOString();
@@ -133,9 +155,17 @@ async function main() {
   }
   if (added || graded) await writeText("wiki/srs/cards.json", JSON.stringify(bank, null, 2) + "\n");
 
-  // 3. select today's set → write into today's daily note
-  const selected = selectDaily(Object.values(bank), { max: DAILY_CAP, now: nowISO });
+  // 3. select today's set → write into today's daily note.
+  // Pass yesterday's ids so today can't hand back the same questions: a New card
+  // only advances once an answer is graded, so while grading lags the pool is
+  // static and an unrotated pick repeats verbatim.
   const stem = todayStem();
+  const prevIds = await previousQuizIds(stem);
+  const selected = selectDaily(Object.values(bank), {
+    max: DAILY_CAP,
+    now: nowISO,
+    exclude: prevIds,
+  });
   const daily = await readText(`sources/daily/${stem}.md`);
   const fm =
     daily?.match(/^(---\n[\s\S]*?\n---\s*\n)/)?.[1] ?? `---\ntype: daily\nCreated: ${todayISO()}\n---\n`;
@@ -150,6 +180,25 @@ async function main() {
   console.log(
     `✓ srs ingest — +${added} new card(s), ${graded} graded, ${selected.length} selected for ${stem} (bank: ${Object.keys(bank).length})`,
   );
+
+  // Make a stalled deck loud instead of silent. Cards only leave the New state
+  // when an answer is graded, so a bank that is overwhelmingly New means the
+  // answer→grade loop is not closing and the schedule is not advancing.
+  const all = Object.values(bank);
+  const newCount = all.filter((c) => c.srs.state === 0).length;
+  if (all.length >= 20 && newCount / all.length > 0.8) {
+    console.warn(
+      `⚠ ${newCount}/${all.length} cards are still New. Answers are captured in ` +
+        `wiki/srs/submissions.jsonl and only advance once the ingest GRADES them ` +
+        `(step 10a → _grades.jsonl). Until then the schedule cannot progress.`,
+    );
+  }
+  const repeat = prevIds.length
+    ? selected.filter((c) => prevIds.includes(c.id)).length
+    : 0;
+  if (repeat && repeat === selected.length) {
+    console.warn(`⚠ today's ${repeat} question(s) all repeat the previous day's set.`);
+  }
 }
 
 main().catch((e) => {

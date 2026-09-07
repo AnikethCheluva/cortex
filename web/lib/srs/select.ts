@@ -4,7 +4,19 @@
 import type { Card } from "./types";
 import { isDue, retrievability, State } from "./schedule";
 
-export type SelectOpts = { max?: number; maxNew?: number; now?: string };
+export type SelectOpts = {
+  max?: number;
+  maxNew?: number;
+  now?: string;
+  /** Card ids served on the previous day, so today can avoid repeating them. */
+  exclude?: string[];
+};
+
+/** Days since the epoch for a date — the rotation key for new-card selection. */
+function dayNumber(nowISO: string): number {
+  const t = Date.parse(`${nowISO.slice(0, 10)}T00:00:00Z`);
+  return Number.isNaN(t) ? 0 : Math.floor(t / 86_400_000);
+}
 
 /** Reorder so adjacent cards come from different topics where possible. */
 export function interleave(cards: Card[]): Card[] {
@@ -49,8 +61,44 @@ export function selectDaily(cards: Card[], opts: SelectOpts = {}): Card[] {
   // giving reviews the daily cap first, a backlog GATES new cards — introducing
   // new material while you're behind only deepens the hole — and the introduction
   // of new cards resumes automatically once you've caught up.
-  const reviewSlots = Math.min(due.length, max);
-  const newSlots = Math.min(maxNew, max - reviewSlots);
-  const newCards = fresh.slice(0, newSlots);
-  return interleave([...due.slice(0, reviewSlots), ...newCards]);
+  const skip = new Set(opts.exclude ?? []);
+
+  // Due reviews still come first — a card you already learned and are about to
+  // forget matters more than new material, and a backlog therefore gates new
+  // cards rather than piling on top of them.
+  //
+  // The one refinement: a due card served YESTERDAY and left unanswered steps
+  // aside for a day if there is other material to show. Re-serving something you
+  // just skipped teaches nothing, and when the answer→grade loop stalls it is
+  // what makes every daily note come out identical. The card stays due and
+  // returns; it simply doesn't monopolise the quiz.
+  const dueFresh = due.filter((c) => !skip.has(c.id));
+  const dueRepeat = due.filter((c) => skip.has(c.id));
+
+  // New cards rotate by date rather than always taking the head of the pool.
+  // A New card only leaves the New state once an answer is graded, so while
+  // grading lags `fresh` never changes and a fixed prefix hands back the very
+  // same questions day after day. Walking a window through the pool keeps the
+  // deck moving on its own, and is deterministic per day so re-running an
+  // ingest is idempotent.
+  const freshPool = fresh.filter((c) => !skip.has(c.id));
+  const usable = freshPool.length ? freshPool : fresh;
+  const start = usable.length ? (dayNumber(now) * Math.max(1, maxNew)) % usable.length : 0;
+  const rotatedNew = [...usable.slice(start), ...usable.slice(0, start)];
+
+  const picked: Card[] = [];
+  const take = (list: Card[], limit: number) => {
+    for (const c of list) {
+      if (picked.length >= max || limit <= 0) return;
+      if (picked.some((p) => p.id === c.id)) continue;
+      picked.push(c);
+      limit--;
+    }
+  };
+
+  take(dueFresh, max); // 1. reviews you haven't just seen
+  take(rotatedNew, Math.min(maxNew, Math.max(0, max - picked.length))); // 2. new material
+  take(dueRepeat, max - picked.length); // 3. yesterday's unanswered, to top up
+
+  return interleave(picked);
 }

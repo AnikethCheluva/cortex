@@ -93,3 +93,71 @@ describe("dueCount", () => {
     expect(dueCount([newCard("n"), future], t0)).toBe(1);
   });
 });
+
+describe("a stalled deck must not repeat itself", () => {
+  // The 2026-08/09 regression: 300+ New cards, nothing graded, so `fresh` never
+  // changed and a fixed prefix served byte-identical quizzes for a week — the
+  // daily notes looked duplicated.
+  const stalled = Array.from({ length: 300 }, (_, i) => newCard(`n${i}`, `topic${i % 7}`));
+
+  const ids = (day: string) =>
+    selectDaily(stalled, { max: 20, maxNew: 8, now: `${day}T09:00:00.000Z` })
+      .map((c) => c.id)
+      .sort()
+      .join(",");
+
+  it("serves a different set on consecutive days", () => {
+    expect(ids("2026-09-01")).not.toBe(ids("2026-09-02"));
+    expect(ids("2026-09-02")).not.toBe(ids("2026-09-03"));
+    expect(ids("2026-09-03")).not.toBe(ids("2026-09-04"));
+  });
+
+  it("stays deterministic within a day, so re-running an ingest is idempotent", () => {
+    expect(ids("2026-09-01")).toBe(ids("2026-09-01"));
+  });
+
+  it("works through the pool rather than cycling a handful of cards", () => {
+    const seen = new Set<string>();
+    for (let d = 1; d <= 20; d++) {
+      const day = `2026-09-${String(d).padStart(2, "0")}`;
+      for (const id of ids(day).split(",")) seen.add(id);
+    }
+    // 20 days x 8 new cards: a fixed prefix would have shown only 8 distinct.
+    expect(seen.size).toBeGreaterThan(100);
+  });
+
+  it("can be told to avoid yesterday's cards outright", () => {
+    const yesterday = selectDaily(stalled, { max: 20, maxNew: 8, now: "2026-09-01T09:00:00.000Z" });
+    const today = selectDaily(stalled, {
+      max: 20,
+      maxNew: 8,
+      now: "2026-09-02T09:00:00.000Z",
+      exclude: yesterday.map((c) => c.id),
+    });
+    const overlap = today.filter((c) => yesterday.some((y) => y.id === c.id));
+    expect(overlap).toHaveLength(0);
+  });
+
+  it("still serves cards when the exclude list would starve the pool", () => {
+    const tiny = Array.from({ length: 5 }, (_, i) => newCard(`t${i}`));
+    const out = selectDaily(tiny, {
+      max: 20,
+      maxNew: 8,
+      now: "2026-09-02T09:00:00.000Z",
+      exclude: tiny.map((c) => c.id), // everything excluded
+    });
+    expect(out.length).toBeGreaterThan(0);
+  });
+
+  it("keeps due reviews in every set — rotation only moves NEW cards", () => {
+    const dues = Array.from({ length: 3 }, (_, i) => dueCard(`d${i}`));
+    for (const day of ["2026-09-01", "2026-09-02", "2026-09-03"]) {
+      const out = selectDaily([...dues, ...stalled], {
+        max: 20,
+        maxNew: 8,
+        now: `${day}T09:00:00.000Z`,
+      });
+      expect(out.filter((c) => c.id.startsWith("d"))).toHaveLength(3);
+    }
+  });
+});
