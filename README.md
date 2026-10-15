@@ -1,6 +1,4 @@
-# Cortex
-
-### A little more room to think.
+[![Cortex — A little more room to think.](docs/images/cortex-header.png)](https://cortex-workspace.sassygnome16.chatgpt.site)
 
 An open-source workspace for your notes, calendar, tasks, and a wiki-grounded Codex assistant. Apple Dark by default, with responsive desktop and phone layouts.
 

@@ -8,6 +8,7 @@
 //
 // When it is enabled the write API enforces the same session server-side (see
 // lib/apiauth.ts), so this screen is the front door rather than decoration.
+import { CortexMark } from "./CortexMark";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 type State = "checking" | "open" | "locked" | "authed";
@@ -145,14 +146,7 @@ export function LoginGate({ children }: { children: React.ReactNode }) {
   return (
     <div className="login-screen">
       <form className="login-card" onSubmit={submit}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          className="login-mark"
-          src="/icon.svg"
-          alt=""
-          width={72}
-          height={72}
-        />
+        <div className="login-mark"><CortexMark size={72} /></div>
         <h1 className="login-title">Cortex</h1>
 
         {session?.google && (

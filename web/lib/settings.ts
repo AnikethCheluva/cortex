@@ -1,4 +1,5 @@
 "use client";
+import { brainSvg } from "./brainmark";
 
 // User preferences — theme, tab order, Overview widget layout, and locally-held
 // integration credentials. Everything lives in the BROWSER (localStorage), never
@@ -184,6 +185,14 @@ function emit() {
 export function applyTheme(theme: ThemeId) {
   if (typeof document === "undefined") return;
   document.documentElement.setAttribute("data-theme", theme);
+  const colors = getComputedStyle(document.documentElement);
+  const accent = colors.getPropertyValue("--accent").trim() || "#0091ff";
+  const background = colors.getPropertyValue("--bg").trim() || "#1c1c1e";
+  const icon = document.querySelector<HTMLLinkElement>('link[rel="icon"]') || document.createElement("link");
+  icon.rel = "icon";
+  icon.type = "image/svg+xml";
+  icon.href = `data:image/svg+xml,${encodeURIComponent(brainSvg(accent, background))}`;
+  if (!icon.isConnected) document.head.appendChild(icon);
 }
 
 export function getSettings(): Settings {
