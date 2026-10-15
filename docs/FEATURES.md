@@ -4,7 +4,7 @@
 
 Today offers one-column daily capture and a compact task list. Overview retains cards and customizable widgets. Voice capture uses browser speech recognition where available, with an optional OpenAI-compatible transcription service. Browser speech processing may use the browser vendor’s servers; it is not guaranteed to stay on-device.
 
-Docs offers a paper-like editor with rich formatting, Markdown persistence, inline/display LaTeX, and folder organization. Wiki is a read-only presentation of compiled knowledge with backlinks, tags, source references, curated folders, and a flat alphabetical index. The header’s Curated/All pages menu controls browsing; global search is the single search entry. The live page count is plain text above the divider.
+Docs offers a paper-like editor with rich formatting, Markdown persistence, inline/display LaTeX, and folder organization. Wiki is a read-only presentation of compiled knowledge with backlinks, tags, source references, curated folders, and a flat alphabetical index. The header’s Curated/All pages segmented control controls browsing; global search is the single search entry. The live page count is plain text above the divider.
 
 Recall supports daily quizzes, reference answers, measurements, and FSRS scheduling through the ingest tools. Activity records changes and renders relevant diffs. Notion import preserves imported material as source captures.
 

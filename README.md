@@ -4,7 +4,7 @@
 
 An open-source workspace for your notes, calendar, tasks, and a wiki-grounded Codex assistant. Apple Dark by default, with responsive desktop and phone layouts.
 
-**[Explore the showcase](https://anikethcheluva.github.io/cortex/)** · **[Setup & deployment](web/DEPLOY.md)** · **[Connect Codex](tooling/cortex-codex-bridge/README.md)** · **[Feature guide](docs/FEATURES.md)**
+**[Explore the showcase](https://cortex-workspace.sassygnome16.chatgpt.site)** · **[Setup & deployment](web/DEPLOY.md)** · **[Connect Codex](tooling/cortex-codex-bridge/README.md)** · **[Feature guide](docs/FEATURES.md)**
 
 Cortex brings raw capture → connected knowledge → scheduled action into one workspace. Your source notes and synthesized wiki stay in Markdown. The public repository contains application code, an empty starter, and fictional demo content—not a personal vault. The showcase is a static site, not a shared Cortex instance.
 

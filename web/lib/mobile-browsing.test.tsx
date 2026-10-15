@@ -92,11 +92,11 @@ function Library() {
 it("uses the header view selector and preserves it when returning from a page", () => {
   render(<><div id="workspace-phone-actions" /><Library /></>);
   expect(screen.queryByLabelText("Search wiki pages")).toBeNull();
-  fireEvent.change(screen.getByLabelText("Wiki view"), { target: { value: "all" } });
+  fireEvent.click(screen.getByRole("button", { name: "All pages", exact: true }));
   fireEvent.click(screen.getByRole("button", { name: /Robotics Learning/ }));
   expect(screen.getByRole("article").textContent).toBe("Policy experiments");
   expect(screen.queryByLabelText("Wiki view")).toBeNull();
   fireEvent.click(screen.getByRole("button", { name: /All pages/ }));
-  expect(screen.getByLabelText("Wiki view")).toHaveProperty("value", "all");
+  expect(screen.getByRole("button", { name: "All pages", exact: true }).getAttribute("aria-pressed")).toBe("true");
   expect(screen.getByRole("button", { name: /Algebra Vectors/ })).toBeTruthy();
 });

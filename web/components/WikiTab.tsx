@@ -221,7 +221,10 @@ function WikiIndex({
   const mobile = useMobile();
   const [headerHost, setHeaderHost] = useState<HTMLElement | null>(null);
   useEffect(() => { setHeaderHost(mobile ? document.getElementById("workspace-phone-actions") : null); }, [mobile]);
-  const selector = <label className="wiki-header-selector"><span className="sr-only">Wiki view</span><select aria-label="Wiki view" value={view} onChange={event => setView(event.target.value as "curated" | "all")}><option value="curated">Curated</option><option value="all">All pages</option></select></label>;
+  const selector = <div className="wiki-header-selector wiki-view-toggle" role="group" aria-label="Wiki view">
+    <button className={`seg ${view === "curated" ? "active" : ""}`} aria-pressed={view === "curated"} onClick={() => setView("curated")}>Curated</button>
+    <button className={`seg ${view === "all" ? "active" : ""}`} aria-pressed={view === "all"} onClick={() => setView("all")}>All pages</button>
+  </div>;
   return (
     <div>
       {headerHost && visible && createPortal(selector, headerHost)}

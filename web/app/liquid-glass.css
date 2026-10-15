@@ -425,3 +425,8 @@ button, input, select, textarea { font-family: var(--font); }
 .is-mobile .wiki-header-selector { position: fixed; left: max(16px, env(safe-area-inset-left)); top: calc(env(safe-area-inset-top) + 4px); z-index: 45; }
 .wiki-workspace .wiki-index-heading { border-bottom: 1px solid var(--rule); padding-bottom: 12px; }
 .is-mobile .wiki-workspace .wiki-index-heading { margin-top: 0; margin-bottom: 18px; min-height: 30px; }
+
+.wiki-header-selector.wiki-view-toggle { display: inline-flex; gap: 0; padding: 3px; border-radius: var(--native-radius-pill); }
+.is-mobile .wiki-header-selector.wiki-view-toggle { left: max(10px, env(safe-area-inset-left)); max-width: calc(50vw - 40px); }
+.is-mobile .wiki-header-selector .seg { min-height: 38px; padding: 7px 8px; font-size: 11px; white-space: nowrap; border-radius: var(--native-radius-pill); }
+@media (max-width: 350px) { .is-mobile .wiki-header-selector .seg { padding-inline: 5px; font-size: 10px; } }
