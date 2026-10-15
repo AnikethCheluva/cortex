@@ -37,26 +37,95 @@ This writes a gitignored local setting. Cortex never automatically reads a paren
 
 ## A look inside
 
-Real app captures in Apple Dark, using only the bundled fictional demo vault.
+Every workspace page except Settings, captured in Apple Dark on desktop and phone. All content comes from the bundled fictional demo vault. Expand a page and click either image for the full-size capture.
 
-**Desktop — room for the whole picture.**
-
-[![Cortex desktop overview with task progress, notes, and knowledge widgets](docs/images/app-desktop-overview.jpg)](docs/images/app-desktop-overview.jpg)
-
-**On your phone — tasks and knowledge, within reach.**
+<details open>
+<summary><strong>Overview</strong> · Desktop &amp; phone</summary>
 
 <p>
-  <a href="docs/images/app-phone-tasks.jpg"><img src="docs/images/app-phone-tasks.jpg" alt="Cortex Tasks on a phone, with compact filters and floating navigation" width="240"></a>
-  &nbsp;
-  <a href="docs/images/app-phone-wiki.jpg"><img src="docs/images/app-phone-wiki.jpg" alt="Cortex Wiki on a phone, with the Curated and All pages control and sample concept pages" width="240"></a>
+  <a href="docs/images/app-desktop-overview.jpg"><img src="docs/images/app-desktop-overview.jpg" alt="Cortex Overview — desktop, fictional demo workspace" width="680"></a>
+  <a href="docs/images/app-phone-overview.jpg"><img src="docs/images/app-phone-overview.jpg" alt="Cortex Overview — phone, fictional demo workspace" width="200"></a>
 </p>
 
+</details>
+
 <details>
-<summary>See the desktop task workspace</summary>
+<summary><strong>Today</strong> · Desktop &amp; phone</summary>
 
-Priorities, progress, and planning in one view.
+<p>
+  <a href="docs/images/app-desktop-today.jpg"><img src="docs/images/app-desktop-today.jpg" alt="Cortex Today — desktop, fictional demo workspace" width="680"></a>
+  <a href="docs/images/app-phone-today.jpg"><img src="docs/images/app-phone-today.jpg" alt="Cortex Today — phone, fictional demo workspace" width="200"></a>
+</p>
 
-[![Cortex desktop Tasks with priority, status, due dates, and Plan with Codex](docs/images/app-desktop-tasks.jpg)](docs/images/app-desktop-tasks.jpg)
+</details>
+
+<details>
+<summary><strong>Daily</strong> · Desktop &amp; phone</summary>
+
+<p>
+  <a href="docs/images/app-desktop-daily.jpg"><img src="docs/images/app-desktop-daily.jpg" alt="Cortex Daily — desktop, fictional demo workspace" width="680"></a>
+  <a href="docs/images/app-phone-daily.jpg"><img src="docs/images/app-phone-daily.jpg" alt="Cortex Daily — phone, fictional demo workspace" width="200"></a>
+</p>
+
+</details>
+
+<details>
+<summary><strong>Docs</strong> · Desktop &amp; phone</summary>
+
+<p>
+  <a href="docs/images/app-desktop-docs.jpg"><img src="docs/images/app-desktop-docs.jpg" alt="Cortex Docs — desktop, fictional demo workspace" width="680"></a>
+  <a href="docs/images/app-phone-docs.jpg"><img src="docs/images/app-phone-docs.jpg" alt="Cortex Docs — phone, fictional demo workspace" width="200"></a>
+</p>
+
+</details>
+
+<details>
+<summary><strong>Calendar</strong> · Desktop &amp; phone</summary>
+
+<p>
+  <a href="docs/images/app-desktop-calendar.jpg"><img src="docs/images/app-desktop-calendar.jpg" alt="Cortex Calendar — desktop, fictional demo workspace" width="680"></a>
+  <a href="docs/images/app-phone-calendar.jpg"><img src="docs/images/app-phone-calendar.jpg" alt="Cortex Calendar — phone, fictional demo workspace" width="200"></a>
+</p>
+
+</details>
+
+<details>
+<summary><strong>Wiki</strong> · Desktop &amp; phone</summary>
+
+<p>
+  <a href="docs/images/app-desktop-wiki.jpg"><img src="docs/images/app-desktop-wiki.jpg" alt="Cortex Wiki — desktop, fictional demo workspace" width="680"></a>
+  <a href="docs/images/app-phone-wiki.jpg"><img src="docs/images/app-phone-wiki.jpg" alt="Cortex Wiki — phone, fictional demo workspace" width="200"></a>
+</p>
+
+</details>
+
+<details>
+<summary><strong>Agent</strong> · Desktop &amp; phone</summary>
+
+<p>
+  <a href="docs/images/app-desktop-agent.jpg"><img src="docs/images/app-desktop-agent.jpg" alt="Cortex Agent — desktop, fictional demo workspace" width="680"></a>
+  <a href="docs/images/app-phone-agent.jpg"><img src="docs/images/app-phone-agent.jpg" alt="Cortex Agent — phone, fictional demo workspace" width="200"></a>
+</p>
+
+</details>
+
+<details>
+<summary><strong>Tasks</strong> · Desktop &amp; phone</summary>
+
+<p>
+  <a href="docs/images/app-desktop-tasks.jpg"><img src="docs/images/app-desktop-tasks.jpg" alt="Cortex Tasks — desktop, fictional demo workspace" width="680"></a>
+  <a href="docs/images/app-phone-tasks.jpg"><img src="docs/images/app-phone-tasks.jpg" alt="Cortex Tasks — phone, fictional demo workspace" width="200"></a>
+</p>
+
+</details>
+
+<details>
+<summary><strong>Activity</strong> · Desktop &amp; phone</summary>
+
+<p>
+  <a href="docs/images/app-desktop-activity.jpg"><img src="docs/images/app-desktop-activity.jpg" alt="Cortex Activity — desktop, fictional demo workspace" width="680"></a>
+  <a href="docs/images/app-phone-activity.jpg"><img src="docs/images/app-phone-activity.jpg" alt="Cortex Activity — phone, fictional demo workspace" width="200"></a>
+</p>
 
 </details>
 
