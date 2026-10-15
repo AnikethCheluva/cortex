@@ -116,3 +116,7 @@ describe("automatic deadlines", () => {
     expect(boxes.every((box) => box.dueDate === undefined)).toBe(true);
   });
 });
+
+it("leaves already planned tasks in their existing slots", () => {
+  expect(planTaskTimeboxes([{...task("planned", "Already scheduled"), timebox_start: "2026-10-15T09:00:00Z"}], [], new Date("2026-10-14T08:00:00Z"))).toEqual([]);
+});

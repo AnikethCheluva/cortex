@@ -38,7 +38,7 @@ export function taskEvents(tasks: Task[]): CalEvent[] {
   return tasks
     .filter(
       (task) =>
-        task.status !== "done" && task.due_date && validTaskDate(task.due_date),
+        task.status !== "done" && (Boolean(task.timebox_start) || (task.due_date && validTaskDate(task.due_date))),
     )
     .map((task) => ({
       id: `task:${task.id}`,

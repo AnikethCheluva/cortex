@@ -20,7 +20,7 @@ import { Dialog } from "./Dialog";
 import { useMobile } from "@/lib/useMobile";
 
 type Focus = { id: string; n: number } | null;
-type Filter = "all" | "today" | "upcoming" | "overdue" | "undated" | "done";
+type Filter = "all" | "today" | "upcoming" | "overdue" | "undated" | "done" | "planned" | "unplanned";
 type Workspace = ReturnType<typeof useTaskWorkspace>;
 const STATUS: Record<TaskStatus, string> = {
   todo: "To do",
@@ -33,6 +33,8 @@ const FILTERS: [Filter, string][] = [
   ["upcoming", "Upcoming"],
   ["overdue", "Overdue"],
   ["undated", "No date"],
+  ["planned", "Planned"],
+  ["unplanned", "Unplanned"],
   ["done", "Completed"],
 ];
 
@@ -102,6 +104,8 @@ export function TasksTab({
     today: dueToday,
     overdue,
     done: completed,
+    planned: open.filter(task => Boolean(task.timebox_start)).length,
+    unplanned: open.filter(task => !task.timebox_start).length,
     upcoming: open.filter((task) => task.due_date > today).length,
     undated: open.filter((task) => !task.due_date).length,
   };
@@ -116,6 +120,8 @@ export function TasksTab({
               !(layout === "board" && filter === "all")
         )
           return false;
+        if (filter === "planned" && !task.timebox_start) return false;
+        if (filter === "unplanned" && task.timebox_start) return false;
         if (filter === "today" && task.due_date !== today) return false;
         if (filter === "upcoming" && task.due_date <= today) return false;
         if (filter === "overdue" && (!task.due_date || task.due_date >= today))
@@ -385,6 +391,7 @@ export function TasksTab({
                       onClick={() => setEditing(task.id)}
                     >
                       <span>{task.title}</span>
+                      <small className="task-estimate" title={task.timebox_start ? new Date(task.timebox_start).toLocaleString() : "No calendar block scheduled"}>{task.timebox_start ? "Planned" : "Unplanned"}</small>
                       {(layout === "board" || task.estimate_minutes > 0) && (
                         <small className="task-estimate">
                           {layout === "board" && task.project.replaceAll("-", " ")}

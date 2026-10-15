@@ -142,3 +142,8 @@ describe("calendar layout", () => {
     expect(monthDays(new Date(2026, 1, 1))).toHaveLength(42);
   });
 });
+
+it("renders a scheduled task without requiring a due date", () => {
+  const task = {id: "manual", title: "Plan report", status: "todo", priority: "medium", due_date: "", estimate_minutes: 90, timebox_start: "2026-10-15T09:00:00Z", project: "", tags: [], page_slug: "", created_at: "", updated_at: "", completed_at: "", body: ""} as Task;
+  expect(taskEvents([task])).toEqual([expect.objectContaining({taskId: "manual", allDay: false, start: task.timebox_start, end: "2026-10-15T10:30:00.000Z"})]);
+});

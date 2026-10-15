@@ -399,7 +399,7 @@ export function CalendarTab({
       horizonStart.setHours(0, 0, 0, 0);
       const horizonEnd = addDays(horizonStart, TIMEBOX_HORIZON_DAYS);
       const external = await listEvents(horizonStart.toISOString(), horizonEnd.toISOString());
-      const busy = [...external, ...plannedToEvents(planned, horizonStart.toISOString(), horizonEnd.toISOString())];
+      const busy = [...external, ...taskEvents(tasks), ...plannedToEvents(planned, horizonStart.toISOString(), horizonEnd.toISOString())];
       let estimates: Record<string, number> = {};
       let usedFallback = false;
       try {
@@ -409,7 +409,7 @@ export function CalendarTab({
       }
       const timeboxes = planTaskTimeboxes(tasks, busy, new Date(), estimates);
       const scheduledIds = new Set(timeboxes.map((box) => box.taskId));
-      const unscheduled = tasks.filter((task) => task.status !== "done" && !scheduledIds.has(task.id));
+      const unscheduled = tasks.filter((task) => task.status !== "done" && !task.timebox_start && !scheduledIds.has(task.id));
       const missed = unscheduled.length
         ? ` Could not fit before the due date or within the next 14 days: ${unscheduled.map((task) => `${task.title}${task.due_date ? ` (due ${task.due_date})` : ""}`).join("; ")}. Existing blocks for these tasks are unchanged; review their dates or estimates.`
         : "";
@@ -460,7 +460,7 @@ export function CalendarTab({
       else if (key === "w") changeView("week");
       else if (key === "m") changeView("month");
       else if (key === "a") changeView("agenda");
-      else if (key === "n" && connected) setCompose({ day, minute: 9 * 60 });
+      else if (key === "n") setCompose({ day, minute: 9 * 60 });
       else if (key === "arrowleft" && target === document.body) step(-1);
       else if (key === "arrowright" && target === document.body) step(1);
       else return;
@@ -593,7 +593,7 @@ export function CalendarTab({
                   className="btn calendar-timebox-action"
                   aria-label={timeboxing ? "Timeboxing…" : "Auto timebox"}
                   onClick={() => void autoTimebox()}
-                  disabled={timeboxing || !tasks.some((task) => task.status !== "done")}
+                  disabled={timeboxing || !tasks.some((task) => task.status !== "done" && !task.timebox_start)}
                   title="Place open tasks into focused work blocks"
                 >
                   <Icon name="clock" size={16} />
@@ -603,10 +603,9 @@ export function CalendarTab({
                   className="btn btn-primary calendar-create-action"
                   aria-label="New event"
                   onClick={() => setCompose({ day, minute: 9 * 60 })}
-                  disabled={!connected}
                   title={
                     !connected
-                      ? "Connect Google or Outlook to create events"
+                      ? "Create an event or schedule a task"
                       : "New event (N)"
                   }
                 >
@@ -827,12 +826,7 @@ export function CalendarTab({
                 byDay={byDay}
                 now={now}
                 onPick={setDetail}
-                onCompose={
-                  connected
-                    ? (date, minute, endMinute) =>
-                        setCompose({ day: date, minute, endMinute })
-                    : undefined
-                }
+                onCompose={(date, minute, endMinute) => setCompose({ day: date, minute, endMinute })}
                 dropProps={dropProps}
               />
             )}
@@ -855,7 +849,7 @@ export function CalendarTab({
             <span>
               {connected
                 ? "Swipe or scroll sideways to change dates · Drag to create an event"
-                : "Connect a calendar to add meetings and time blocks"}
+                : "Drag on the calendar to schedule a task. Connect a calendar to add meetings."}
             </span>
           </div>
         </div>
@@ -908,6 +902,8 @@ export function CalendarTab({
       )}
       {compose && (
         <Compose
+          tasks={tasks}
+          onSchedule={async (box) => { await saveTimeboxes([box]); setCompose(null); }}
           conn={conn}
           initial={compose}
           onClose={() => setCompose(null)}
@@ -1791,17 +1787,25 @@ function EventDetail({
   );
 }
 function Compose({
+  tasks,
+  onSchedule,
   conn,
   initial,
   onClose,
   onCreated,
 }: {
+  tasks: Task[];
+  onSchedule: (box: TaskTimebox) => Promise<void>;
   conn: ConnectionState;
   initial: EventSelection;
   onClose: () => void;
   onCreated: (event: CalEvent, colorId: string) => Promise<void>;
 }) {
   const providers = PROVIDERS.filter((provider) => conn[provider]);
+  const [mode, setMode] = useState<"task" | "event">("task");
+  const [taskId, setTaskId] = useState("");
+  const [taskQuery, setTaskQuery] = useState("");
+  const availableTasks = tasks.filter(task => task.status !== "done" && task.title.toLowerCase().includes(taskQuery.toLowerCase()));
   const [provider, setProvider] = useState<ConnectedProvider>(providers[0]);
   const [title, setTitle] = useState(""),
     [location, setLocation] = useState("");
@@ -1821,7 +1825,7 @@ function Compose({
   async function submit(event: FormEvent) {
     event.preventDefault();
     if (submitting.current) return;
-    if (!title.trim()) {
+    if (mode === "event" && !title.trim()) {
       setError("Give your event a name.");
       return;
     }
@@ -1835,10 +1839,17 @@ function Compose({
       setError("Choose an end after the start.");
       return;
     }
+    if (mode === "task" && !tasks.some(task => task.id === taskId && task.status !== "done")) { setError("Select a task to schedule."); return; }
+    if (mode === "task" && (new Date(end).getTime() - new Date(start).getTime()) / 60000 > 480) { setError("Choose a block of 8 hours or less."); return; }
+    if (mode === "task" && ((new Date(end).getTime() - new Date(start).getTime()) / 60000) % 15 !== 0) { setError("Use a duration in 15-minute increments."); return; }
     submitting.current = true;
     setSaving(true);
     setError("");
     try {
+      if (mode === "task") {
+        await onSchedule({taskId, start: new Date(start).toISOString(), minutes: Math.round((new Date(end).getTime() - new Date(start).getTime()) / 60000), dueDate: end.slice(0, 10)});
+        return;
+      }
       const id = await createEvent({
         provider,
         colorId: provider === "google" ? colorId || undefined : undefined,
@@ -1872,7 +1883,7 @@ function Compose({
   }
   return (
     <Dialog
-      label="New calendar event"
+      label="Schedule calendar time"
       className="calendar-compose-dialog"
       onClose={() => {
         if (!saving) onClose();
@@ -1881,7 +1892,7 @@ function Compose({
       <form onSubmit={submit}>
         <div className="modal-h editor-heading">
           <div>
-            <h2>New event</h2>
+            <h2>{mode === "task" ? "Schedule task" : "New event"}</h2>
           </div>
           <button
             type="button"
@@ -1894,7 +1905,19 @@ function Compose({
           </button>
         </div>
         <div className="modal-body task-editor">
-          <label>
+          <div className="view-switch" role="group" aria-label="Schedule type">
+            <button type="button" aria-pressed={mode === "task"} onClick={() => { setMode("task"); setAllDay(false); }}>Task</button>
+            <button type="button" aria-pressed={mode === "event"} disabled={!providers.length} onClick={() => setMode("event")}>Event</button>
+          </div>
+          {mode === "task" && <>
+            <label>Find a task<input autoFocus type="search" value={taskQuery} onChange={event => setTaskQuery(event.target.value)} placeholder="Search your task list…" /></label>
+            <label>Task<select required value={taskId} onChange={event => setTaskId(event.target.value)}>
+              <option value="">Select a task</option>
+              {availableTasks.map(task => <option key={task.id} value={task.id}>{task.title}{task.timebox_start ? " · Planned" : ""}</option>)}
+            </select></label>
+            <p className="field-hint">{tasks.find(task => task.id === taskId)?.timebox_start ? "This will move the task’s existing block to this time." : "This time becomes the task’s focus block on your calendar."}</p>
+          </>}
+          {mode === "event" && <><label>
             Event name
             <input
               required
@@ -1936,7 +1959,7 @@ function Compose({
               onChange={(event) => setAllDay(event.target.checked)}
             />
             All day
-          </label>
+          </label></>}
           <div className="editor-fields">
             <label>
               Starts
@@ -1970,14 +1993,14 @@ function Compose({
               ? "Includes the end date."
               : `Times in ${Intl.DateTimeFormat().resolvedOptions().timeZone.replaceAll("_", " ")}.`}
           </p>
-          <label>
+          {mode === "event" && <label>
             <span>Location <span className="muted">(optional)</span></span>
             <input
               value={location}
               onChange={(event) => setLocation(event.target.value)}
               placeholder="Add a location or meeting link"
             />
-          </label>
+          </label>}
           {error && (
             <div className="banner" role="alert">
               {error}
@@ -1995,7 +2018,7 @@ function Compose({
             Cancel
           </button>
           <button className="btn btn-primary" disabled={saving}>
-            {saving ? "Creating…" : "Create event"}
+            {saving ? "Saving…" : mode === "task" ? "Schedule task" : "Create event"}
           </button>
         </div>
       </form>

@@ -35,3 +35,9 @@ Mobile uses one centered page title, a floating global search button, and floati
 ## Optional services
 
 Calendar OAuth, Codex, Notion, remote transcription, GitHub write-back, and Convex each need independent configuration. The core local starter requires none of them. Raycast, iOS Shortcuts/widgets, and Slack capture clients remain available; configure their endpoints and secrets for your own instance. See the guides in `clients/`, `tooling/`, and `web/`.
+
+### Manual task timeboxing
+
+Drag a time range on the calendar, choose **Task**, search your existing task list, and select **Schedule task**. The selected duration becomes the task’s time estimate and it appears as a timed task block. Existing deadlines stay intact; tasks without deadlines receive the block’s end date. Scheduling a planned task moves its existing block. No external calendar connection is required.
+
+The Tasks page shows **Planned** or **Unplanned** and includes matching filters. Automatic timeboxing skips already planned tasks and schedules around their blocks. Choose **Event** in the same dialog to create an external calendar event when a calendar is connected.

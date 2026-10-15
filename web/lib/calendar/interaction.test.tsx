@@ -123,7 +123,7 @@ describe("drag-to-create calendar events", () => {
         pointerType: "mouse",
       });
       const dialog = within(
-        screen.getByRole("dialog", { name: "New calendar event" }),
+        screen.getByRole("dialog", { name: "Schedule calendar time" }),
       );
       expect((dialog.getByLabelText("Starts") as HTMLInputElement).value).toBe(
         `${today}T09:00`,
@@ -131,6 +131,7 @@ describe("drag-to-create calendar events", () => {
       expect((dialog.getByLabelText("Ends") as HTMLInputElement).value).toBe(
         `${today}T10:30`,
       );
+      fireEvent.click(dialog.getByRole("button", { name: "Event", exact: true }));
       fireEvent.change(dialog.getByLabelText("Event name"), {
         target: { value: "Research focus" },
       });
@@ -329,6 +330,7 @@ describe("event colors", () => {
     fireEvent.click(
       screen.getByRole("button", { name: "New event", exact: true }),
     );
+    fireEvent.click(screen.getByRole("button", { name: "Event", exact: true }));
     fireEvent.change(screen.getByLabelText("Event name"), {
       target: { value: "Colored event" },
     });
@@ -589,4 +591,26 @@ it("browses weeks in the phone month dropdown without moving the timeline, then 
     expect(screen.queryByRole("region", {name:"Month calendar. Scroll vertically by week."})).toBeNull();
     expect(screen.queryByLabelText("Calendar date")).toBeNull();
   } finally { height.mockRestore(); }
+});
+
+
+it("schedules an existing task from a dragged range without an external calendar", async () => {
+  api.connections.mockResolvedValue({google: false, microsoft: false});
+  const save = vi.fn().mockResolvedValue(undefined);
+  const task = {id: "manual", title: "Draft proposal", status: "todo" as const, priority: "high" as const,
+    due_date: "", estimate_minutes: 60, project: "", tags: [], page_slug: "", created_at: "", updated_at: "", completed_at: "", timebox_start: "", body: ""};
+  render(<CalendarTab tasks={[task]} openTask={vi.fn()} rescheduleTask={vi.fn()} saveTimeboxes={save} />);
+  await waitFor(() => expect(api.listEvents).toHaveBeenCalled());
+  const today = dateKey(new Date());
+  const slot = screen.getByRole("button", {name: `New event ${today} 9 AM`});
+  const column = slot.parentElement!;
+  fireEvent.pointerDown(slot, {clientY: 9 * HOUR_PX, button: 0, pointerId: 1, pointerType: "mouse"});
+  fireEvent.pointerMove(column, {clientY: 10.5 * HOUR_PX, pointerId: 1, pointerType: "mouse"});
+  fireEvent.pointerUp(column, {clientY: 10.5 * HOUR_PX, pointerId: 1, pointerType: "mouse"});
+  const dialog = within(screen.getByRole("dialog", {name: "Schedule calendar time"}));
+  fireEvent.change(dialog.getByLabelText("Task", {exact: true}), {target: {value: "manual"}});
+  fireEvent.change(dialog.getByLabelText("Ends"), {target: {value: `${today}T10:30`}});
+  fireEvent.click(dialog.getByRole("button", {name: "Schedule task"}));
+  await waitFor(() => expect(save).toHaveBeenCalledWith([{taskId: "manual", start: new Date(`${today}T09:00`).toISOString(), minutes: 90, dueDate: today}]));
+  expect(api.createEvent).not.toHaveBeenCalled();
 });

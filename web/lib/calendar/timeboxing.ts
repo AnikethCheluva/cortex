@@ -73,7 +73,7 @@ export function planTaskTimeboxes(
       : estimateTaskMinutes(task);
   }
   const candidates = tasks
-    .filter((task) => task.status !== "done")
+    .filter((task) => task.status !== "done" && !task.timebox_start)
     .sort((a, b) => {
       const priority = { high: 0, medium: 1, low: 2 };
       return (
