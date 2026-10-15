@@ -35,6 +35,31 @@ node scripts/use-vault.mjs /absolute/path/to/your-private-vault
 
 This writes a gitignored local setting. Cortex never automatically reads a parent directory. Do not copy your real notes into the examples directories: those are tracked public fixtures.
 
+## A look inside
+
+Real app captures in Apple Dark, using only the bundled fictional demo vault.
+
+**Desktop — room for the whole picture.**
+
+[![Cortex desktop overview with task progress, notes, and knowledge widgets](docs/images/app-desktop-overview.jpg)](docs/images/app-desktop-overview.jpg)
+
+**On your phone — tasks and knowledge, within reach.**
+
+<p>
+  <a href="docs/images/app-phone-tasks.jpg"><img src="docs/images/app-phone-tasks.jpg" alt="Cortex Tasks on a phone, with compact filters and floating navigation" width="240"></a>
+  &nbsp;
+  <a href="docs/images/app-phone-wiki.jpg"><img src="docs/images/app-phone-wiki.jpg" alt="Cortex Wiki on a phone, with the Curated and All pages control and sample concept pages" width="240"></a>
+</p>
+
+<details>
+<summary>See the desktop task workspace</summary>
+
+Priorities, progress, and planning in one view.
+
+[![Cortex desktop Tasks with priority, status, due dates, and Plan with Codex](docs/images/app-desktop-tasks.jpg)](docs/images/app-desktop-tasks.jpg)
+
+</details>
+
 ## What’s inside
 
 | Area | Features |
