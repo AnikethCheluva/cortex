@@ -23,6 +23,10 @@ export type Task = {
   created_at: string;
   updated_at: string;
   completed_at: string;
+  /** Agent-estimated focused work, in minutes. Zero means use the estimator. */
+  estimate_minutes: number;
+  /** A scheduled local-time work block, stored as an ISO timestamp. */
+  timebox_start: string;
   body: string;
 };
 
@@ -34,7 +38,12 @@ export type DailyMeta = {
 };
 export type DailyNote = DailyMeta & { body: string };
 
-export type LogEntry = { date: string; action: string; heading: string; body: string };
+export type LogEntry = {
+  date: string;
+  action: string;
+  heading: string;
+  body: string;
+};
 
 // Persistent documents (Google-Docs-style) authored in the web app and stored in
 // sources/notes/ — they're wiki SOURCES the ingest later compiles into pages.
@@ -44,8 +53,14 @@ export type NoteDocMeta = {
   created: string;
   updated: string;
   preview: string;
+  /** Docs folder id, or "" for the top level. */
+  folder?: string;
 };
 export type NoteDoc = NoteDocMeta & { body: string; exists?: boolean };
+
+/** A Docs folder. Membership lives in each document's `folder:` frontmatter;
+ *  this manifest exists so an EMPTY folder still has somewhere to live. */
+export type NoteFolder = { id: string; name: string; created: string };
 
 // Agent-scoped deliverable/milestone dates, written by the ingest into
 // wiki/calendar/planned.json and overlaid on the calendar as a "Planned" source.
@@ -65,11 +80,13 @@ export type PlannedEvent = {
 
 // The whole vault, read once at build time and handed to the static SPA.
 export type VaultData = {
+  changelog?: import("./changelog/types").DailyChangelog[];
   wiki: WikiPage[];
   tasks: Task[];
   daily: DailyNote[];
   log: LogEntry[];
   planned: PlannedEvent[];
   notes: NoteDocMeta[];
+  noteFolders: NoteFolder[];
   builtAt: string;
 };

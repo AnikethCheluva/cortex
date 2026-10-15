@@ -15,6 +15,7 @@ import type {
   LogEntry,
   PlannedEvent,
   NoteDocMeta,
+  NoteFolder,
   VaultData,
 } from "./types";
 import {
@@ -26,10 +27,12 @@ import {
   safeMatter,
 } from "./parse";
 import { dailyDate } from "./day";
+import { readChangelog } from "./changelog/records";
+import type { DailyChangelog } from "./changelog/types";
 
-// Vault root resolution (VAULT_PATH → bundled example vault → parent of web/).
-export { VAULT_ROOT } from "./vaultroot";
+// Vault root = parent of the web/ app dir. Overridable via env if relocated.
 import { VAULT_ROOT } from "./vaultroot";
+export { VAULT_ROOT } from "./vaultroot";
 
 const WIKI_PAGES = path.join(VAULT_ROOT, "wiki", "pages");
 const WIKI_TASKS = path.join(VAULT_ROOT, "wiki", "tasks");
@@ -148,10 +151,30 @@ async function loadNotes(): Promise<NoteDocMeta[]> {
       created: d.created,
       updated: d.updated,
       preview: firstParagraph(d.body, 100),
+      folder: d.folder,
     });
   }
   // newest-edited first
   return notes.sort((a, b) => (b.updated || "").localeCompare(a.updated || ""));
+}
+
+// ---- Docs folders ---------------------------------------------------------
+// Membership lives in each document's frontmatter; this manifest only exists so
+// an empty folder still shows up.
+async function loadNoteFolders(): Promise<NoteFolder[]> {
+  try {
+    const raw = await fs.readFile(
+      path.join(VAULT_ROOT, "sources", "notes", "folders.json"),
+      "utf8",
+    );
+    const obj = JSON.parse(raw);
+    const arr = Array.isArray(obj) ? obj : obj?.folders;
+    return Array.isArray(arr)
+      ? arr.filter((f): f is NoteFolder => Boolean(f && f.id && f.name))
+      : [];
+  } catch {
+    return []; // no folders yet
+  }
 }
 
 // ---- planned deliverables (calendar overlay) ------------------------------
@@ -161,7 +184,9 @@ async function loadPlanned(): Promise<PlannedEvent[]> {
     const obj = JSON.parse(raw);
     const arr = Array.isArray(obj) ? obj : obj?.events;
     return Array.isArray(arr)
-      ? arr.filter((e): e is PlannedEvent => Boolean(e && e.id && e.title && e.date))
+      ? arr.filter((e): e is PlannedEvent =>
+          Boolean(e && e.id && e.title && e.date),
+        )
       : [];
   } catch {
     return []; // no planned file yet
@@ -169,14 +194,50 @@ async function loadPlanned(): Promise<PlannedEvent[]> {
 }
 
 // ---- aggregate (called once at build time) --------------------------------
+async function loadChangelog(): Promise<DailyChangelog[]> {
+  const directory = path.join(VAULT_ROOT, "wiki/changelog");
+  let names: string[];
+  try {
+    names = await fs.readdir(directory);
+  } catch {
+    return [];
+  }
+  const days: DailyChangelog[] = [];
+  for (const name of names
+    .filter((name) => /^\d{4}-\d{2}-\d{2}\.json$/.test(name))
+    .sort()
+    .reverse()
+    .slice(0, 30)) {
+    days.push(
+      readChangelog(
+        await fs.readFile(path.join(directory, name), "utf8"),
+        name.slice(0, 10),
+      ),
+    );
+  }
+  return days;
+}
 export async function loadVault(): Promise<VaultData> {
-  const [wiki, tasks, daily, log, planned, notes] = await Promise.all([
-    loadWikiPages(),
-    loadTasks(),
-    loadDaily(),
-    loadLog(),
-    loadPlanned(),
-    loadNotes(),
-  ]);
-  return { wiki, tasks, daily, log, planned, notes, builtAt: new Date().toISOString() };
+  const [wiki, tasks, daily, log, planned, notes, noteFolders, changelog] =
+    await Promise.all([
+      loadWikiPages(),
+      loadTasks(),
+      loadDaily(),
+      loadLog(),
+      loadPlanned(),
+      loadNotes(),
+      loadNoteFolders(),
+      loadChangelog(),
+    ]);
+  return {
+    wiki,
+    tasks,
+    daily,
+    log,
+    planned,
+    notes,
+    noteFolders,
+    changelog,
+    builtAt: new Date().toISOString(),
+  };
 }

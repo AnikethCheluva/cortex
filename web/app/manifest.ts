@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 // Web app manifest — makes the site installable as a standalone app (the
 // home-screen "app" experience). iOS uses the apple-icon + apple meta tags;
-// Android/Chrome use this manifest. Colors match the dark notebook theme.
+// Android/Chrome use this manifest. Colors match the default Slate theme.
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
@@ -12,8 +12,8 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     scope: "/",
     display: "standalone",
-    background_color: "#14130d",
-    theme_color: "#14130d",
+    background_color: "#181b20",
+    theme_color: "#181b20",
     icons: [
       // SVG scales crisply to any size (Dock/Launchpad); PNG fallback for
       // browsers that want a raster icon at install time.

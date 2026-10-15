@@ -44,6 +44,31 @@ const dueCard = (id: string, topic = "t"): Card =>
   });
 
 describe("selectDaily", () => {
+  it("never lets new cards displace yesterday's overdue backlog", () => {
+    const due = Array.from({ length: 6 }, (_, i) => dueCard(`d${i}`));
+    const out = selectDaily([...due, newCard("new")], { now: t0, max: 4, exclude: due.map(c => c.id) });
+    expect(out).toHaveLength(4);
+    expect(out.every(c => c.srs.state !== 0)).toBe(true);
+  });
+
+  it("spreads new questions across topics before truncating", () => {
+    const input = [...Array.from({length: 20}, (_, i) => newCard(`a${i}`, "A")), newCard("b", "B"), newCard("c", "C")];
+    const out = selectDaily(input, { now: t0, max: 4 });
+    expect(new Set(out.map(c => c.topic)).size).toBe(3);
+  });
+
+  it("rotates at New York midnight rather than UTC midnight", () => {
+    const input = Array.from({length: 100}, (_, i) => newCard(`a${i}`));
+    const ids = (now: string) => selectDaily(input, {now}).map(c => c.id);
+    expect(ids("2026-10-13T23:59:00Z")).toEqual(ids("2026-10-14T00:01:00Z"));
+    expect(ids("2026-10-14T03:59:00Z")).not.toEqual(ids("2026-10-14T04:01:00Z"));
+  });
+
+  it("bounds non-finite and negative daily limits", () => {
+    const input = Array.from({length: 100}, (_, i) => newCard(`a${i}`));
+    expect(selectDaily(input, {now:t0, max:NaN, maxNew:Infinity})).toHaveLength(8);
+    expect(selectDaily(input, {now:t0, max:-1})).toHaveLength(0);
+  });
   it("caps the total set at `max`", () => {
     const cards = Array.from({ length: 30 }, (_, i) => newCard(`c${i}`));
     expect(selectDaily(cards, { max: 5, now: t0 }).length).toBe(5);
@@ -81,6 +106,10 @@ describe("selectDaily", () => {
 });
 
 describe("interleave", () => {
+  it("handles uneven topic pools without avoidable adjacent repeats", () => {
+    const out = interleave([newCard("b", "B"), newCard("a1", "A"), newCard("a2", "A"), newCard("a3", "A"), newCard("c", "C")]);
+    expect(out.every((c, i) => !i || c.topic !== out[i-1].topic)).toBe(true);
+  });
   it("separates adjacent same-topic cards", () => {
     const out = interleave([newCard("a1", "A"), newCard("a2", "A"), newCard("b1", "B")]);
     expect(out.map((c) => c.topic)).toEqual(["A", "B", "A"]);

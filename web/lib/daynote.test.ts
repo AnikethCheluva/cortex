@@ -96,10 +96,10 @@ describe("mergeDayNote — the quiz block is server-managed", () => {
   it("keeps the existing quiz when the client sends a body without one", () => {
     // The exact 8-28-26 regression: a tab loaded before the morning routine
     // ran saves a body with no quiz block, clobbering the day's questions.
-    const merged = mergeDayNote("Egoverse 2.0 plan", onDisk);
+    const merged = mergeDayNote("Example launch plan", onDisk);
     expect(merged).toContain(QUIZ_MARKER);
     expect(merged).toContain("What is a policy?");
-    expect(merged).toContain("Egoverse 2.0 plan");
+    expect(merged).toContain("Example launch plan");
     expect(merged).not.toContain("Morning thoughts");
   });
 

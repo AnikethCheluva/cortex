@@ -1,5 +1,6 @@
 import type { CalEvent } from "./types";
 import type { PlannedEvent } from "@/lib/types";
+import { shiftDate } from "@/lib/task-dates";
 
 const day = (s: string) => s.slice(0, 10);
 
@@ -21,7 +22,8 @@ export function plannedToEvents(
     .map((p) => {
       const allDay = p.allDay !== false;
       const start = allDay ? `${day(p.date)}T00:00:00Z` : p.date;
-      const end = allDay ? `${day(p.end || p.date)}T00:00:00Z` : p.end || p.date;
+      // The vault's final deliverable day is inclusive; providers use exclusive ends.
+      const end = allDay ? shiftDate(day(p.end || p.date), 1) : p.end || p.date;
       const description =
         [p.kind, p.project && `project: ${p.project}`, p.note].filter(Boolean).join(" · ") ||
         undefined;

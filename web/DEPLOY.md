@@ -1,75 +1,32 @@
-# Deploying the web viewer to Vercel
+# Deploy your own Cortex
 
-The app lives in `web/` inside the wiki repo and deploys as its own Vercel
-project. It reads the vault's markdown at build time and commits edits back to
-GitHub at runtime.
+The public GitHub Pages site is a static showcase. It deliberately cannot read a vault. Deploy the Next.js app separately for your own workspace.
 
-## 1. Create a GitHub token (for write-back)
+## Local setup
 
-A **fine-grained Personal Access Token** scoped to just this repo:
+Use Node.js 22+, `npm ci` in `web/`, then `npm run dev`. Default content is the empty `examples/vault`. From the repository root, `node scripts/use-vault.mjs /absolute/path/to/private-vault` selects your separate vault in a gitignored `.env.local`.
 
-- GitHub → Settings → Developer settings → **Fine-grained tokens** → Generate new
-- Repository access: **Only select repositories** → `your-username/your-wiki-repo`
-- Permissions: **Contents → Read and write**
-- Copy the token (starts with `github_pat_…`).
+## Private hosting
 
-This token only lives in Vercel's server env; it is never sent to the browser.
+1. Create your own private deployment project. Configure its root as `web/`, install with `npm ci`, build with `npm run build`, and start with `npm start` on a Node host.
+2. Provide a vault directory explicitly through `VAULT_PATH`. The runtime must have access to that directory. For a serverless deployment, arrange an explicit private build/runtime copy and file tracing for your vault; the public template does not bundle arbitrary private paths automatically.
+3. Set `APP_PASSWORD` to a strong secret, or configure Google login with `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, `ALLOWED_EMAILS`, and `AUTH_SECRET`. Alternatively protect the whole application and its APIs with a trusted access proxy/deployment protection. Do not rely on hiding the URL.
+4. Set `APP_ORIGIN` to the exact HTTPS origin. Never expose server secrets as `NEXT_PUBLIC_*` variables.
+5. For hosted writes, set `GITHUB_TOKEN`, `GITHUB_REPO=your-name/your-private-vault`, and `GITHUB_BRANCH`. Use a fine-grained token restricted to that private data repository with Contents read/write. Without GitHub write-back, edits use the local filesystem and require persistent writable storage.
+6. Check unauthenticated HTML, API reads, and assets before adding real notes. Server rendering is dynamic and does not load the vault for an unauthenticated visitor when login is enabled. Read and write routes check authentication. `API_TOKEN` enables authorized external clients; it is not a replacement for login.
 
-## 2. Import the project on Vercel
+Vault index reads use the configured local vault; GitHub write-back does not by itself synchronize the entire local checkout. Arrange a private sync/deployment mechanism if you need remote edits reflected in all index views.
 
-- Vercel → **Add New… → Project** → import `your-username/your-wiki-repo`.
-- **Root Directory:** set to `web`.
-  - Make sure **"Include files outside the Root Directory in the build"** is
-    enabled (default for monorepos) — the build reads `../wiki` and `../sources`.
-- Framework preset: **Next.js** (auto-detected).
+## Calendar and Codex
 
-## 3. Set environment variables
+See [calendar setup](CALENDAR.md) for Google and Microsoft OAuth, and [Codex companion setup](../tooling/cortex-codex-bridge/README.md) for agent replies and estimates. Configure your own clients, origin, and bridge secret. No developer account IDs or deployment credentials are included.
 
-In the Vercel project → Settings → **Environment Variables** (Production +
-Preview):
+## Optional Convex mirror
 
-| Name | Value |
-|------|-------|
-| `GITHUB_TOKEN` | the fine-grained token from step 1 |
-| `GITHUB_REPO` | `your-username/your-wiki-repo` |
-| `GITHUB_BRANCH` | `main` |
+Disabled by default. The query requires a verified Convex identity whose email is in its `ALLOWED_EMAILS` environment setting. You must configure a Convex authentication provider and client token integration before enabling `NEXT_PUBLIC_CONVEX_URL`. The app’s password session does not authenticate Convex. Do not remove the query guard to make it work with private data. The synchronization cron is opt-in.
 
-**Voice notes (speech-to-text) — no setup needed.** The **Record** button in the
-Daily/Today editor works out of the box on browsers with the Web Speech API
-(Chrome, and Safari incl. iOS): transcription runs **on-device, free, with no
-API key or provider**.
+## Publishing code safely
 
-Only browsers *without* Web Speech fall back to server transcription, which is
-**optional** and OpenAI-compatible:
+Keep personal data outside this repository. `.gitignore` excludes root vault folders, environment files, credentials, bridge state, and deployment metadata. `node scripts/check-public.mjs` checks tracked files for common secret patterns and disallowed paths. Review `git diff --cached` yourself before publishing: automated checks cannot prove that every piece of text is non-private.
 
-| Name | Value |
-|------|-------|
-| `STT_API_KEY` | *(optional fallback)* an OpenAI or Groq key |
-| `STT_BASE_URL` | *(optional)* `https://api.groq.com/openai/v1` for Groq |
-| `STT_MODEL` | *(optional)* `whisper-large-v3` for Groq |
-
-Audio is transcribed and discarded — never stored — so no database is involved.
-
-Deploy. Your site is live at `https://<project>.vercel.app`.
-
-## 4. How updates appear
-
-- **Wiki / Tasks / Daily / Activity** are baked at build time. They refresh on
-  the next deploy. Any push to the repo (including the app's own commits, and the
-  Slack bot's pushes) triggers a Vercel redeploy automatically.
-- **Today** is read live and saved live via the GitHub API, so it always shows
-  the current day and your latest save without waiting for a redeploy.
-
-## 5. Closing the daily loop
-
-When you press **Save to wiki**, the app commits `sources/daily/<date>.md`. Your
-existing nightly `/ingest` (on the GT machine, via its normal `git pull`) then
-synthesizes that note into `wiki/pages/`. Nothing about the website needs to run
-on the GT machine — the shared GitHub repo is the only link.
-
-## Notes
-
-- Each save / task edit is a commit, which redeploys the site. That's fine for a
-  personal tool; if commit volume ever matters, batch edits before saving.
-- No token configured (e.g. local `npm run dev`) → writes hit the local
-  filesystem vault instead of GitHub, so you can develop without a token.
+The GitHub Pages workflow publishes only `site/`. Do not change the upload path to the repository root, `web/`, or any vault directory.

@@ -30,3 +30,18 @@ tooling/slackbot/.env
 
 # OS
 .DS_Store
+
+# Personal vaults belong outside this public code checkout.
+/sources/
+/wiki/
+/inbox/
+.env.*
+!.env.example
+!**/.env.example
+**/bridge-config.json
+**/connection.json
+**/bridge.log
+**/bridge.error.log
+**/state/
+*.pem
+*.key

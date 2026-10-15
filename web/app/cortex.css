@@ -1,0 +1,9 @@
+/* Keep the shared cascade in one entry point, including during route loading. */
+@import "./globals.css";
+@import "./workspace.css";
+@import "./mobile.css";
+@import "./refinement.css";
+@import "./document-editor.css";
+@import "./native-tokens.css";
+@import "./native.css";
+@import "./liquid-glass.css";

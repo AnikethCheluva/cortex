@@ -7,8 +7,9 @@ import { useMemo } from "react";
 import type { VaultData } from "@/lib/types";
 import { todayISO, prettyISO } from "@/lib/day";
 import { currentStreak, dailyDateSet, lastNDays, taskStats } from "@/lib/stats";
-import { useSettings, WIDGET_META, type TabKey, type WidgetKey } from "@/lib/settings";
+import type { TabKey, WidgetKey } from "@/lib/settings";
 import { RecallDashboard } from "./RecallDashboard";
+import { WidgetBoard } from "./WidgetBoard";
 
 export function Overview({
   data,
@@ -19,7 +20,6 @@ export function Overview({
   onTab: (t: TabKey) => void;
   openDaily: (stem: string) => void;
 }) {
-  const settings = useSettings();
   const today = todayISO();
 
   const { dates, isoToStem } = useMemo(() => {
@@ -221,25 +221,10 @@ export function Overview({
     }
   };
 
-  const visible = settings.widgetOrder.filter((k) => !settings.hiddenWidgets.includes(k));
-
+  // Layout (order, sizes, what's parked) lives in WidgetBoard's edit mode.
   return (
     <div>
-      <h2 className="section">Overview</h2>
-
-      {visible.length === 0 ? (
-        <div className="empty">
-          Every widget is hidden. Turn some back on in <b>Settings → Overview widgets</b>.
-        </div>
-      ) : (
-        <div className="ov-grid" data-density={settings.density}>
-          {visible.map((k) => (
-            <div key={k} className={WIDGET_META[k].wide ? "ov-slot ov-wide" : "ov-slot"}>
-              {widget(k)}
-            </div>
-          ))}
-        </div>
-      )}
+      <WidgetBoard render={widget} />
     </div>
   );
 }

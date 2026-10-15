@@ -8,6 +8,9 @@
 // connection stays put without re-consenting. Needs NEXT_PUBLIC_GOOGLE_CLIENT_ID
 // (a Web OAuth client with this app's origin as an authorized JavaScript origin).
 import type { CalEvent, NewEvent } from "./types";
+import { colorHex } from "./colors";
+import { findMeetingUrl, plainEventText } from "./meetings";
+import { includeGoogleCalendar, type GoogleCalendarSource } from "./sources";
 
 const CLIENT_ID = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "";
 const SCOPE = "https://www.googleapis.com/auth/calendar";
@@ -35,8 +38,9 @@ function loadGsi(): Promise<void> {
     s.src = GSI;
     s.async = true;
     s.defer = true;
-    s.onload = () => resolve();
-    s.onerror = () => reject(new Error("failed to load Google Identity Services"));
+    const timeout = window.setTimeout(() => { s.remove(); gsi = null; reject(new Error("Google sign-in took too long to load. Please retry.")); }, 15000);
+    s.onload = () => { clearTimeout(timeout); resolve(); };
+    s.onerror = () => { clearTimeout(timeout); s.remove(); gsi = null; reject(new Error("Could not load Google sign-in. Please check your connection and retry.")); };
     document.head.appendChild(s);
   });
   return gsi;
@@ -70,22 +74,42 @@ function restoreCached() {
 
 function request(prompt: "" | "consent"): Promise<string> {
   return new Promise((resolve, reject) => {
+    let settled = false;
+    const timeout = window.setTimeout(() => finish(new Error("Google sign-in timed out. Please retry and complete the sign-in window.")), prompt ? 90000 : 8000);
+    function finish(error?: Error, value = "") {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      if (error) reject(error); else resolve(value);
+    }
+    // Each attempt owns its callbacks: a silent refresh cannot overwrite a tap's result.
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    tokenClient.callback = (resp: any) => {
-      if (resp.error) return reject(new Error(resp.error));
-      accessToken = resp.access_token;
-      expiry = Date.now() + (resp.expires_in ? resp.expires_in * 1000 : 3_600_000) - 60_000;
-      localStorage.setItem(TOKEN_KEY, JSON.stringify({ accessToken, expiry }));
-      localStorage.setItem(CONNECTED_KEY, "1"); // remember the grant for silent re-auth
-      resolve(accessToken);
-    };
-    tokenClient.requestAccessToken({ prompt });
+    const attempt = (window as any).google.accounts.oauth2.initTokenClient({
+      client_id: CLIENT_ID,
+      scope: SCOPE,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      callback: (resp: any) => {
+        if (settled) return;
+        if (resp.error) return finish(new Error(resp.error));
+        try {
+          accessToken = resp.access_token;
+          expiry = Date.now() + (resp.expires_in ? resp.expires_in * 1000 : 3_600_000) - 60_000;
+          localStorage.setItem(TOKEN_KEY, JSON.stringify({ accessToken, expiry }));
+          localStorage.setItem(CONNECTED_KEY, "1");
+          finish(undefined, accessToken);
+        } catch { finish(new Error("Your browser could not save the calendar connection.")); }
+      },
+      error_callback: (error: { type?: string }) => finish(new Error(error.type === "popup_closed" ? "Google sign-in was closed. Tap Reconnect calendar to try again." : error.type === "popup_failed_to_open" ? "The sign-in window was blocked. Allow pop-ups for Cortex in Safari, then retry." : "Google sign-in could not open. Please retry.")),
+    });
+    try { attempt.requestAccessToken({ prompt }); } catch (error) { finish(error instanceof Error ? error : new Error("Could not open Google sign-in.")); }
   });
 }
 
-export async function googleSignIn(): Promise<void> {
-  await client();
-  await request("consent");
+export async function googlePrepareSignIn(): Promise<void> { await client(); }
+
+export function googleSignIn(): Promise<void> {
+  // When preloaded, open the provider synchronously inside the tap handler (Safari).
+  return (tokenClient ? request("consent") : client().then(() => request("consent"))).then(() => {});
 }
 
 export function googleSignOut(): void {
@@ -142,11 +166,19 @@ async function api<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 export async function googleListEvents(timeMin: string, timeMax: string): Promise<CalEvent[]> {
-  const cals = await api<{
-    items?: { id: string; selected?: boolean; backgroundColor?: string }[];
-  }>(`/users/me/calendarList`);
+  const calendars: GoogleCalendarSource[] = [];
+  let calendarPage: string | undefined;
+  do {
+    const qs = new URLSearchParams({ maxResults: "250" });
+    if (calendarPage) qs.set("pageToken", calendarPage);
+    const cals = await api<{ items?: GoogleCalendarSource[]; nextPageToken?: string }>(
+      `/users/me/calendarList?${qs}`,
+    );
+    calendars.push(...(cals.items ?? []));
+    calendarPage = cals.nextPageToken;
+  } while (calendarPage);
   const out: CalEvent[] = [];
-  for (const cal of (cals.items ?? []).filter((c) => c.selected !== false)) {
+  for (const cal of calendars.filter(includeGoogleCalendar)) {
     const qs = new URLSearchParams({
       timeMin,
       timeMax,
@@ -154,29 +186,43 @@ export async function googleListEvents(timeMin: string, timeMax: string): Promis
       orderBy: "startTime",
       maxResults: "250",
     });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const ev = await api<{ items?: any[] }>(`/calendars/${encodeURIComponent(cal.id)}/events?${qs}`);
-    for (const e of ev.items ?? []) {
-      const allDay = Boolean(e.start?.date);
-      out.push({
-        id: e.id,
-        provider: "google",
-        calendarId: cal.id,
-        title: e.summary || "(no title)",
-        start: e.start?.dateTime || e.start?.date,
-        end: e.end?.dateTime || e.end?.date,
-        allDay,
-        location: e.location,
-        description: e.description,
-        link: e.htmlLink,
-        color: cal.backgroundColor,
-      });
-    }
+    let pageToken: string | undefined;
+    do {
+      if (pageToken) qs.set("pageToken", pageToken);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ev = await api<{ items?: any[]; nextPageToken?: string }>(`/calendars/${encodeURIComponent(cal.id)}/events?${qs}`);
+      for (const e of ev.items ?? []) {
+        if (e.status === "cancelled" || !e.start || !e.end) continue;
+        const allDay = Boolean(e.start?.date);
+        out.push({
+          id: e.id,
+          provider: "google",
+          calendarId: cal.id,
+          title: e.summary || "(no title)",
+          start: e.start?.dateTime || e.start?.date,
+          end: e.end?.dateTime || e.end?.date,
+          allDay,
+          location: e.location,
+          description: plainEventText(e.description),
+          calendarName: cal.summaryOverride || cal.summary,
+          meetingUrl: findMeetingUrl([e.hangoutLink, ...(e.conferenceData?.entryPoints ?? []).filter((entry: { entryPointType?: string }) => entry.entryPointType === "video").map((entry: { uri?: string }) => entry.uri)], [e.location, e.description]),
+          recurring: Boolean(e.recurringEventId || e.recurrence),
+          organizer: e.organizer?.displayName || e.organizer?.email,
+          attendees: e.attendees?.map((attendee: { displayName?: string; email?: string; responseStatus?: string }) => ({ name: attendee.displayName || attendee.email || "Guest", response: attendee.responseStatus })),
+          link: e.htmlLink,
+          color: colorHex(e.colorId) ?? cal.backgroundColor,
+          colorId: e.colorId,
+          calendarColor: cal.backgroundColor,
+          colorReadOnly: cal.accessRole !== "owner" && cal.accessRole !== "writer",
+        });
+      }
+      pageToken = ev.nextPageToken;
+    } while (pageToken);
   }
   return out;
 }
 
-export async function googleCreate(ev: NewEvent): Promise<void> {
+export async function googleCreate(ev: NewEvent): Promise<string> {
   const body = ev.allDay
     ? {
         summary: ev.title,
@@ -192,7 +238,16 @@ export async function googleCreate(ev: NewEvent): Promise<void> {
         start: { dateTime: ev.start },
         end: { dateTime: ev.end },
       };
-  await api(`/calendars/primary/events`, { method: "POST", body: JSON.stringify(body) });
+  const created = await api<{ id: string }>(`/calendars/primary/events`, { method: "POST", body: JSON.stringify({ ...body, colorId: ev.colorId || undefined }) });
+  return created.id;
+}
+
+export async function googleSetEventColor(event: CalEvent, colorId: string): Promise<void> {
+  if (colorId && !colorHex(colorId)) throw new Error("Choose a valid event color.");
+  await api(`/calendars/${encodeURIComponent(event.calendarId)}/events/${encodeURIComponent(event.id)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ colorId: colorId || null }),
+  });
 }
 
 export async function googleDelete(calendarId: string, id: string): Promise<void> {

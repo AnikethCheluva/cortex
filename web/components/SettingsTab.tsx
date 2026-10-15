@@ -10,7 +10,9 @@ import { useCallback, useEffect, useState } from "react";
 import {
   ALL_TABS,
   ALL_WIDGETS,
+  DEFAULT_SPANS,
   EMPTY_CREDS,
+  SPAN_LABEL,
   TAB_LABEL,
   THEMES,
   WIDGET_META,
@@ -28,6 +30,7 @@ import {
   type ThemeId,
   type WidgetKey,
 } from "@/lib/settings";
+import { CalendarConnectionSettings } from "./CalendarConnectionSettings";
 import { logout } from "./LoginGate";
 
 type NotionItem = { id: string; title: string; type: "page" | "database"; url: string; edited: string };
@@ -111,25 +114,45 @@ export function SettingsTab() {
       <section className="set-block">
         <h3 className="set-h">Overview widgets</h3>
         <p className="set-sub">
-          Choose what the Overview shows and in what order. Wide widgets span the full row.
+          Position and size are set by dragging on the board itself: open <b>Overview</b> →{" "}
+          <b>Edit layout</b>, then drag cards where you want them, resize with S / M / L, and park
+          the ones you don't need. Toggle them here if you prefer.
         </p>
-        <OrderList
-          items={s.widgetOrder}
-          hidden={s.hiddenWidgets}
-          label={(k) => WIDGET_META[k].label}
-          hint={(k) => WIDGET_META[k].hint}
-          badge={(k) => (WIDGET_META[k].wide ? "wide" : undefined)}
-          onMove={(k, dir) => setSettings((cur) => ({ widgetOrder: move(cur.widgetOrder, k, dir) }))}
-          onToggle={(k) => setSettings((cur) => ({ hiddenWidgets: toggle(cur.hiddenWidgets, k) }))}
-        />
+        <ul className="order-list">
+          {ALL_WIDGETS.map((k) => {
+            const off = s.hiddenWidgets.includes(k);
+            return (
+              <li key={k} className={`order-row ${off ? "is-off" : ""}`}>
+                <span className="order-main">
+                  <span className="order-label">
+                    {WIDGET_META[k].label}
+                    <span className="order-badge">{SPAN_LABEL[s.widgetSpans[k] ?? 1]}</span>
+                  </span>
+                  <span className="order-hint">{WIDGET_META[k].hint}</span>
+                </span>
+                <button
+                  className={`switch ${off ? "" : "on"}`}
+                  onClick={() => setSettings((cur) => ({ hiddenWidgets: toggle(cur.hiddenWidgets, k) }))}
+                  role="switch"
+                  aria-checked={!off}
+                  title={off ? "Show" : "Hide"}
+                >
+                  <span className="switch-knob" />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
         <button
           className="btn small"
-          onClick={() => setSettings({ widgetOrder: [...ALL_WIDGETS], hiddenWidgets: [] })}
+          onClick={() => setSettings({ widgetOrder: [...ALL_WIDGETS], hiddenWidgets: [], widgetSpans: { ...DEFAULT_SPANS } })}
         >
-          Show all widgets
+          Reset widget layout
         </button>
       </section>
 
+      <CalendarConnectionSettings />
+      <CodexSection />
       <NotionSection />
       <AccountSection />
 
@@ -146,6 +169,61 @@ export function SettingsTab() {
         </button>
       </section>
     </div>
+  );
+}
+
+function CodexSection() {
+  const [state, setState] = useState<{
+    loading: boolean;
+    connected: boolean;
+    message: string;
+    plan: string | null;
+  }>({ loading: true, connected: false, message: "Checking your Codex connection…", plan: null });
+
+  const check = useCallback(() => {
+    setState((current) => ({ ...current, loading: true }));
+    fetch(`/api/agent?t=${Date.now()}`, { cache: "no-store" })
+      .then((response) => response.json())
+      .then((body) =>
+        setState({
+          loading: false,
+          connected: Boolean(body.connected),
+          message: String(body.message || "Codex is not connected."),
+          plan: body.plan ? String(body.plan) : null,
+        }),
+      )
+      .catch(() =>
+        setState({ loading: false, connected: false, message: "Could not check Codex.", plan: null }),
+      );
+  }, []);
+
+  useEffect(() => check(), [check]);
+
+  return (
+    <section className="set-block codex-connection">
+      <div className="set-section-heading">
+        <div>
+          <h3 className="set-h">Codex</h3>
+          <p className="set-sub">
+            Command-K prompts and task planning use the Codex plan already signed in on your Mac.
+          </p>
+        </div>
+        <span className={`connection-pill ${state.connected ? "connected" : ""}`}>
+          <i /> {state.loading ? "Checking" : state.connected ? "Connected" : "Offline"}
+        </span>
+      </div>
+      <div className="set-row">
+        <div>
+          <div className="set-row-title">
+            {state.connected ? "Your Codex plan is connected" : "Local Codex connection"}
+          </div>
+          <div className="set-row-hint">{state.message}</div>
+        </div>
+        <button className="btn small" onClick={check} disabled={state.loading}>
+          {state.loading ? "Checking…" : "Check connection"}
+        </button>
+      </div>
+    </section>
   );
 }
 
@@ -437,14 +515,17 @@ function NotionSection() {
 
 // ---------- account ----------
 function AccountSection() {
-  const [enabled, setEnabled] = useState<boolean | null>(null);
+  const [info, setInfo] = useState<{ enabled: boolean; google: boolean; password: boolean } | null>(
+    null,
+  );
 
   useEffect(() => {
     fetch("/api/auth/session", { cache: "no-store" })
       .then((r) => r.json())
-      .then((b: { enabled: boolean }) => setEnabled(b.enabled))
-      .catch(() => setEnabled(false));
+      .then((b) => setInfo({ enabled: b.enabled, google: b.google, password: b.password }))
+      .catch(() => setInfo({ enabled: false, google: false, password: false }));
   }, []);
+  const enabled = info?.enabled ?? null;
 
   if (enabled === null) return null;
 
@@ -453,15 +534,24 @@ function AccountSection() {
       <h3 className="set-h">Account</h3>
       {enabled ? (
         <>
-          <p className="set-sub">You’re signed in to this deployment.</p>
+          <p className="set-sub">
+            You’re signed in to this deployment
+            {info?.google && info?.password
+              ? " (Google or password)."
+              : info?.google
+                ? " with Google."
+                : "."}
+          </p>
           <button className="btn small" onClick={() => logout()}>
             Sign out
           </button>
         </>
       ) : (
         <p className="set-sub">
-          This deployment has no password. Set <code>APP_PASSWORD</code> in your environment to
-          require a sign-in — writes then need a valid session too.
+          This deployment is open. Set <code>APP_PASSWORD</code> for a shared password, or
+          <code>ALLOWED_EMAILS</code> + <code>AUTH_SECRET</code> (with the existing
+          <code>NEXT_PUBLIC_GOOGLE_CLIENT_ID</code>) for Google sign-in. Writes then need a valid
+          session too.
         </p>
       )}
     </section>

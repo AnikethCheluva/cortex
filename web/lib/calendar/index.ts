@@ -3,12 +3,13 @@
 // Unified calendar facade over Google + Microsoft. Everything is client-side; a
 // provider is only queried when it's both configured (has a client ID) and
 // connected (signed in this browser).
-import type { CalEvent, CalProvider, NewEvent } from "./types";
+import type { CalEvent, CalProvider, ConnectedProvider, NewEvent } from "./types";
 import * as g from "./google";
 import * as m from "./microsoft";
 
-export type { CalEvent, CalProvider, NewEvent } from "./types";
+export type { CalEvent, CalProvider, ConnectedProvider, NewEvent } from "./types";
 export { PROVIDER_LABEL } from "./types";
+export { googleSetEventColor as setGoogleEventColor } from "./google";
 
 export const providerConfigured = (p: CalProvider) =>
   p === "google" ? g.googleConfigured() : p === "microsoft" ? m.microsoftConfigured() : false;
@@ -24,19 +25,21 @@ export async function connections(): Promise<Record<CalProvider, boolean>> {
     google, // silently re-grants on load if the user connected before (no popup)
     microsoft, // MSAL already persists + silently refreshes via localStorage cache
     planned: false, // not an OAuth source — its visibility is a UI toggle
+    tasks: false,
   };
 }
 
-export const signIn = (p: CalProvider) => (p === "google" ? g.googleSignIn() : m.microsoftSignIn());
-export const signOut = (p: CalProvider) =>
+export const prepareConnection = (p: ConnectedProvider) => p === "google" ? g.googlePrepareSignIn() : m.microsoftPrepareSignIn();
+export const signIn = (p: ConnectedProvider) => (p === "google" ? g.googleSignIn() : m.microsoftSignIn());
+export const signOut = (p: ConnectedProvider) =>
   p === "google" ? Promise.resolve(g.googleSignOut()) : m.microsoftSignOut();
 
 export async function listEvents(startISO: string, endISO: string): Promise<CalEvent[]> {
   const tasks: Promise<CalEvent[]>[] = [];
   if (g.googleConfigured() && g.googleConnected())
-    tasks.push(g.googleListEvents(startISO, endISO).catch(() => []));
+    tasks.push(g.googleListEvents(startISO, endISO));
   if (m.microsoftConfigured() && (await m.microsoftConnected().catch(() => false)))
-    tasks.push(m.microsoftListEvents(startISO, endISO).catch(() => []));
+    tasks.push(m.microsoftListEvents(startISO, endISO));
   const results = await Promise.all(tasks);
   return results.flat().sort((a, b) => a.start.localeCompare(b.start));
 }

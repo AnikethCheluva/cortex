@@ -66,13 +66,22 @@ export function parseWikiPage(slug: string, raw: string): WikiPage {
 export function parseNoteDoc(
   slug: string,
   raw: string,
-): { slug: string; title: string; created: string; updated: string; body: string } {
+): {
+  slug: string;
+  title: string;
+  created: string;
+  updated: string;
+  folder: string;
+  body: string;
+} {
   const { data, content } = safeMatter(raw);
   return {
     slug,
     title: String(data.title ?? slug),
     created: ymd(data.created),
     updated: ymd(data.updated),
+    // Which Docs folder this document sits in ("" = top level).
+    folder: data.folder ? String(data.folder) : "",
     body: content.trim(),
   };
 }
@@ -97,6 +106,8 @@ export function parseTask(id: string, raw: string): Task {
     created_at: ymd(data.created_at),
     updated_at: ymd(data.updated_at),
     completed_at: ymd(data.completed_at),
+    estimate_minutes: Math.max(0, Math.min(480, Number(data.estimate_minutes) || 0)),
+    timebox_start: data.timebox_start ? String(data.timebox_start) : "",
     body: content.trim(),
   };
 }
@@ -143,21 +154,25 @@ export function buildTaskFile(input: {
   due_date?: string;
   page_slug?: string;
   tags?: string[];
+  estimate_minutes?: number;
+  timebox_start?: string;
   today: string;
   body?: string;
 }): string {
   const tags = input.tags?.length ? `[${input.tags.join(", ")}]` : "[]";
   return [
     "---",
-    `title: ${input.title.trim()}`,
+    `title: ${JSON.stringify(input.title.trim())}`,
     "status: todo",
     `priority: ${input.priority ?? "medium"}`,
     `due_date: ${input.due_date ?? ""}`,
-    `project: ${input.project?.trim() || "unsorted"}`,
+    `project: ${JSON.stringify(input.project?.trim() || "unsorted")}`,
     `tags: ${tags}`,
     `page_slug: ${input.page_slug ?? ""}`,
     `created_at: ${input.today}`,
     `updated_at: ${input.today}`,
+    `estimate_minutes: ${Math.max(0, Math.min(480, Math.round(input.estimate_minutes ?? 0)))}`,
+    `timebox_start: ${input.timebox_start ?? ""}`,
     "---",
     "",
     (input.body ?? "").trim() || "_Jotted from the web viewer._",

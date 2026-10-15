@@ -23,6 +23,9 @@ describe("normalizeGrade", () => {
 });
 
 describe("ratingFromVerdict", () => {
+  it("does not turn invalid verdicts into memory lapses", () => {
+    expect(() => ratingFromVerdict("typo" as never)).toThrow("Invalid recall verdict");
+  });
   it("maps verdicts to FSRS grades", () => {
     expect(ratingFromVerdict("correct")).toBe(3);
     expect(ratingFromVerdict("partial")).toBe(2);

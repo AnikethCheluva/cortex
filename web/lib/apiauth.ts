@@ -34,7 +34,7 @@ export function apiAuthorized(req: Request): boolean {
   //    header on non-GET fetches; match it to this deployment's host.
   const origin = req.headers.get("origin") || req.headers.get("referer") || "";
   const appOrigin = process.env.APP_ORIGIN || "";
-  if (appOrigin && origin.startsWith(appOrigin)) return true;
+  if (appOrigin) { try { if (new URL(origin).origin === new URL(appOrigin).origin) return true; } catch { /* invalid origin */ } }
   try {
     const host = req.headers.get("host");
     if (host && origin && new URL(origin).host === host) return true;
@@ -49,4 +49,9 @@ export function unauthorized() {
   return authEnabled()
     ? { error: "unauthorized — sign in, or send Authorization: Bearer <API_TOKEN>" }
     : { error: "unauthorized — send Authorization: Bearer <API_TOKEN>" };
+}
+
+/** Reads stay open only in deliberately unauthenticated local/demo setups. */
+export function readAuthorized(req: Request): boolean {
+  return !authEnabled() || apiAuthorized(req);
 }

@@ -5,7 +5,7 @@
 import type { Bloom, Card, QuestionType } from "./types";
 import { newCardState } from "./schedule";
 
-const GEN_MODEL = "claude-ingest";
+const GEN_MODEL = "cortex-ingest";
 
 export type Candidate = {
   stem: string;
@@ -73,14 +73,24 @@ function slug(s: string): string {
 
 /** Whether a verified candidate clears the gate (+ whether its stem leaks). */
 export function passedGate(cand: Candidate, a: Anno): { passed: boolean; leak: boolean } {
+  const text = (v: unknown) => typeof v === "string" && v.trim().length > 0;
+  if (!cand || !a || !text(cand.stem) || !text(cand.reference_answer) ||
+      !text(cand.source_span) || !Array.isArray(cand.required_points) ||
+      !cand.required_points.length || !cand.required_points.every(text) ||
+      !["short_answer", "conceptual"].includes(cand.type) ||
+      !["remember", "understand", "apply", "analyze", "evaluate"].includes(cand.bloom) ||
+      !Number.isInteger(cand.difficulty_target) || cand.difficulty_target < 1 || cand.difficulty_target > 5) {
+    return { passed: false, leak: false };
+  }
   const leak = a.answer_leak || stemLeaksAnswer(cand.stem, cand.reference_answer);
   const passed =
-    a.answerable_from_span &&
-    a.reference_correct &&
+    a.answerable_from_span === true &&
+    a.reference_correct === true &&
     !leak &&
-    !a.ambiguous &&
-    !a.trivial &&
-    !a.answerable_without_source;
+    a.answer_leak === false &&
+    a.ambiguous === false &&
+    a.trivial === false &&
+    a.answerable_without_source === false;
   return { passed, leak };
 }
 
@@ -90,6 +100,7 @@ export function buildCard(
   a: Anno,
   nowISO: string,
 ): Card {
+  if (!passedGate(cand, a).passed) throw new Error("Invalid or unverified recall card");
   const { leak } = passedGate(cand, a);
   const flags = [...(a.ambiguous ? ["ambiguous"] : []), ...(a.trivial ? ["trivial"] : [])];
   return {

@@ -30,6 +30,14 @@ const goodAnno: Anno = {
 };
 
 describe("pure card-assembly helpers", () => {
+  it("fails closed for incomplete or malformed model output", () => {
+    for (const broken of [{...cand, required_points:[]}, {...cand,source_span:" "}, {...cand,difficulty_target:6}, {...cand,type:"mcq"}]) {
+      expect(passedGate(broken as Candidate, goodAnno).passed).toBe(false);
+    }
+    expect(passedGate(cand, undefined as unknown as Anno).passed).toBe(false);
+    expect(passedGate(cand, {...goodAnno, trivial: undefined} as unknown as Anno).passed).toBe(false);
+    expect(passedGate(cand, {...goodAnno, reference_correct: "true"} as unknown as Anno).passed).toBe(false);
+  });
   it("normalizeText + jaccard", () => {
     expect(normalizeText("A, B!  c")).toBe("a b c");
     expect(jaccard("alpha beta", "alpha beta")).toBe(1);

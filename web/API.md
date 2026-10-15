@@ -1,4 +1,7 @@
-# Cortex — Integration API
+# Cortex integration API
+
+When login is enabled, data reads and writes require a session cookie or an explicit `Authorization: Bearer <API_TOKEN>`. The public local starter is unauthenticated by default. Protect hosted private data before connecting clients. See [deployment](DEPLOY.md).
+
 
 A small HTTP API over the vault so **any frontend** (Raycast, iOS widgets /
 Shortcuts, a native app, `curl`) can read state and capture notes/tasks. Every
@@ -9,17 +12,9 @@ Base URL: `https://<your-project>.vercel.app`
 
 ## Auth
 
-- **Reads (`GET`)** are open.
-- **Writes (`POST`/`PUT`/`PATCH`)**: if `API_TOKEN` is set in the environment,
-  external clients must send it:
-  ```
-  Authorization: Bearer <API_TOKEN>
-  ```
-  The web app's own same-origin requests are allowed without it. If `API_TOKEN`
-  is unset, writes are open (default).
-
-  > This is a lightweight gate for a personal, login-less tool — it stops casual
-  > external writes, not a determined attacker (the public web UI can write too).
+- With `APP_PASSWORD` or allowlisted Google login enabled, data reads and writes require a valid session cookie or explicit API bearer token.
+- With login disabled, reads are open. `API_TOKEN` limits external writes; same-origin browser writes remain allowed. It is not full user authentication.
+- Keep server tokens out of client bundles and URLs. See `.env.example` and `DEPLOY.md`.
 
 ## Endpoints
 

@@ -1,3 +1,4 @@
+import { readAuthorized } from "@/lib/apiauth";
 import { NextResponse } from "next/server";
 import matter from "gray-matter";
 import { readVaultFile, writeVaultFile } from "@/lib/storage";
@@ -32,9 +33,10 @@ function relFor(stem: string) {
 
 // GET /api/daily/<stem> → load any day's note (live from the vault).
 export async function GET(
-  _req: Request,
+  req: Request,
   { params }: { params: Promise<{ stem: string }> },
 ) {
+  if (!readAuthorized(req)) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const { stem } = await params;
   const iso = stemToISO(stem);
   if (!iso) return NextResponse.json({ error: "bad date" }, { status: 400 });

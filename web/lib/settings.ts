@@ -12,119 +12,8 @@ import { useSyncExternalStore } from "react";
 export const SETTINGS_KEY = "cortex:settings";
 export const CREDS_KEY = "cortex:credentials";
 
-// ---------- themes ----------
-export type ThemeId =
-  | "notebook"
-  | "midnight"
-  | "graphite"
-  | "forest"
-  | "plum"
-  | "ocean"
-  | "ember"
-  | "nord"
-  | "mono"
-  | "parchment"
-  | "sepia"
-  | "daylight";
-
-export type ThemeDef = {
-  id: ThemeId;
-  label: string;
-  hint: string;
-  /** swatch preview: [background, panel, accent] */
-  swatch: [string, string, string];
-  dark: boolean;
-};
-
-export const THEMES: ThemeDef[] = [
-  {
-    id: "notebook",
-    label: "Notebook",
-    hint: "Warm charcoal + brass — the original",
-    swatch: ["#14130d", "#232118", "#d8b15a"],
-    dark: true,
-  },
-  {
-    id: "midnight",
-    label: "Midnight",
-    hint: "Deep navy with an ice-blue accent",
-    swatch: ["#0d1117", "#182130", "#6aa6f0"],
-    dark: true,
-  },
-  {
-    id: "graphite",
-    label: "Graphite",
-    hint: "Neutral slate with a warm amber accent",
-    swatch: ["#121212", "#1f1f1f", "#e0a458"],
-    dark: true,
-  },
-  {
-    id: "forest",
-    label: "Forest",
-    hint: "Deep green with a sage accent",
-    swatch: ["#0e1410", "#1a231c", "#7fbf8f"],
-    dark: true,
-  },
-  {
-    id: "plum",
-    label: "Plum",
-    hint: "Dark aubergine with a rose accent",
-    swatch: ["#14101a", "#221c2c", "#c99bd8"],
-    dark: true,
-  },
-  {
-    id: "ocean",
-    label: "Ocean",
-    hint: "Deep teal with a cyan accent",
-    swatch: ["#071316", "#10272d", "#4fc3d9"],
-    dark: true,
-  },
-  {
-    id: "ember",
-    label: "Ember",
-    hint: "Warm dark with a burnt-orange accent",
-    swatch: ["#17100d", "#291e17", "#ff8c5a"],
-    dark: true,
-  },
-  {
-    id: "nord",
-    label: "Nord",
-    hint: "Cool blue-grey, low contrast",
-    swatch: ["#2e3440", "#434c5e", "#88c0d0"],
-    dark: true,
-  },
-  {
-    id: "mono",
-    label: "Mono",
-    hint: "Pure greyscale, maximum contrast",
-    swatch: ["#0a0a0a", "#1d1d1d", "#ffffff"],
-    dark: true,
-  },
-  {
-    id: "parchment",
-    label: "Parchment",
-    hint: "Light cream paper with ink-brown type",
-    swatch: ["#f4efe2", "#fbf8f0", "#8a6a2f"],
-    dark: false,
-  },
-  {
-    id: "sepia",
-    label: "Sepia",
-    hint: "Aged paper, warm brown ink",
-    swatch: ["#f1e7d5", "#f8f1e3", "#9c5f24"],
-    dark: false,
-  },
-  {
-    id: "daylight",
-    label: "Daylight",
-    hint: "Crisp white with a clear blue accent",
-    swatch: ["#f6f7f9", "#ffffff", "#2f6fd0"],
-    dark: false,
-  },
-];
-
-export const isTheme = (v: unknown): v is ThemeId =>
-  typeof v === "string" && THEMES.some((t) => t.id === v);
+import { DEFAULT_THEME, normalizeTheme, type ThemeId } from "./themes";
+export { THEMES, isTheme, type ThemeId, type ThemeDef } from "./themes";
 
 // ---------- tabs ----------
 export type TabKey =
@@ -134,6 +23,7 @@ export type TabKey =
   | "docs"
   | "calendar"
   | "wiki"
+  | "agent"
   | "tasks"
   | "log";
 
@@ -144,6 +34,7 @@ export const TAB_LABEL: Record<TabKey, string> = {
   docs: "Docs",
   calendar: "Calendar",
   wiki: "Wiki",
+  agent: "Agent",
   tasks: "Tasks",
   log: "Activity",
 };
@@ -155,6 +46,7 @@ export const ALL_TABS: TabKey[] = [
   "docs",
   "calendar",
   "wiki",
+  "agent",
   "tasks",
   "log",
 ];
@@ -181,6 +73,22 @@ export const WIDGET_META: Record<WidgetKey, { label: string; hint: string; wide?
   recall: { label: "Recall dashboard", hint: "Retention, forecast, calibration", wide: true },
 };
 
+/** Apple-style widget sizes, expressed as column span. 3 = full row. */
+export type WidgetSpan = 1 | 2 | 3;
+
+export const SPAN_LABEL: Record<WidgetSpan, string> = { 1: "S", 2: "M", 3: "L" };
+
+export const DEFAULT_SPANS: Record<WidgetKey, WidgetSpan> = {
+  streak: 1,
+  tasks: 1,
+  today: 1,
+  knowledge: 1,
+  planned: 1,
+  recentDocs: 1,
+  activity: 3,
+  recall: 3,
+};
+
 export const ALL_WIDGETS: WidgetKey[] = [
   "streak",
   "tasks",
@@ -199,17 +107,20 @@ export type Settings = {
   hiddenTabs: TabKey[];
   widgetOrder: WidgetKey[];
   hiddenWidgets: WidgetKey[];
+  /** Per-widget size (column span), set by dragging on the Overview board. */
+  widgetSpans: Record<WidgetKey, WidgetSpan>;
   /** Overview cards per row on desktop (2 or 3). */
   density: 2 | 3;
 };
 
 export const DEFAULT_SETTINGS: Settings = {
-  theme: "notebook",
+  theme: DEFAULT_THEME,
   tabOrder: [...ALL_TABS],
   hiddenTabs: [],
   // Everything on by default; the point of the board is that you prune it.
   widgetOrder: [...ALL_WIDGETS],
   hiddenWidgets: [],
+  widgetSpans: { ...DEFAULT_SPANS },
   density: 2,
 };
 
@@ -225,9 +136,19 @@ export function normalize(raw: unknown): Settings {
   // choice (nothing hidden) and must survive normalization.
   const subset = <T extends string>(stored: unknown, all: T[], fallback: T[]): T[] =>
     Array.isArray(stored) ? (stored as T[]).filter((k) => all.includes(k)) : fallback;
+  // Sizes fall back per-widget, so a newly-added widget still gets a sane span.
+  const spans = (stored: unknown): Record<WidgetKey, WidgetSpan> => {
+    const out = { ...DEFAULT_SPANS };
+    const o = (stored ?? {}) as Record<string, unknown>;
+    for (const k of ALL_WIDGETS) {
+      const v = o[k];
+      if (v === 1 || v === 2 || v === 3) out[k] = v;
+    }
+    return out;
+  };
 
   return {
-    theme: isTheme(s.theme) ? s.theme : DEFAULT_SETTINGS.theme,
+    theme: normalizeTheme(s.theme),
     tabOrder: order(s.tabOrder, ALL_TABS),
     // never let every tab be hidden — Overview always stays reachable
     hiddenTabs: subset(s.hiddenTabs, ALL_TABS, DEFAULT_SETTINGS.hiddenTabs).filter(
@@ -235,6 +156,7 @@ export function normalize(raw: unknown): Settings {
     ),
     widgetOrder: order(s.widgetOrder, ALL_WIDGETS),
     hiddenWidgets: subset(s.hiddenWidgets, ALL_WIDGETS, DEFAULT_SETTINGS.hiddenWidgets),
+    widgetSpans: spans(s.widgetSpans),
     density: s.density === 3 ? 3 : 2,
   };
 }

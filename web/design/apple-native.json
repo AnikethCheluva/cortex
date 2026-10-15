@@ -1,0 +1,57 @@
+{
+  "name": "Cortex \u2014 Apple and Liquid Glass inspired interface",
+  "reviewed": "2026-10-14",
+  "references": [
+    {
+      "title": "Apple Human Interface Guidelines",
+      "url": "https://developer.apple.com/design/human-interface-guidelines"
+    },
+    {
+      "title": "Apple Design Resources \u2014 official macOS and iOS UI templates",
+      "url": "https://developer.apple.com/design/resources/"
+    },
+    {
+      "title": "Official macOS UI kit",
+      "url": "https://www.figma.com/community/file/1651309434229735362/macos-27"
+    },
+    {
+      "title": "Official iOS and iPadOS UI kit",
+      "url": "https://www.figma.com/community/file/1651309003795292092/ios-and-ipados-27"
+    },
+    {
+      "title": "Materials",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/materials"
+    },
+    {
+      "title": "Typography",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/typography"
+    },
+    {
+      "title": "Motion",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/motion"
+    },
+    {
+      "title": "Sidebars",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/sidebars"
+    },
+    {
+      "title": "Meet Liquid Glass \u2014 WWDC25",
+      "url": "https://developer.apple.com/videos/play/wwdc2025/219/"
+    },
+    {
+      "title": "Apple system color specifications",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/color"
+    }
+  ],
+  "implementation": {
+    "type": "Web adaptation of Apple platform conventions; not native AppKit or Apple's Liquid Glass renderer",
+    "fonts": "Use the installed Apple system font via -apple-system; keep document and equation typography independent. Do not redistribute SF font files.",
+    "materials": "Liquid Glass-inspired web material for navigation, toolbars, popovers and controls: backdrop blur, saturation, subtle edge highlights, tonal light scattering and damped press feedback. Solid content surfaces. No overlapping glass layers. Solid fallbacks for unsupported blur, reduced transparency and increased contrast.",
+    "geometry": "Concentric radii: 20px cards, 12px inner controls at an 8px inset; 26px sheets. Progressive continuous corners with rounded fallback.",
+    "motion": "120ms feedback, 220ms content transitions, 360ms damped sheet entrances. These are Cortex web tuning values, not claimed Apple constants. No displacement under reduced motion.",
+    "accessibility": "44px touch targets, keyboard focus, increased contrast and reduced motion/transparency preferences.",
+    "surfaces": "Overview and Tasks keep cards; Agent remains full-page with chats on the left and composer attachments; Docs retains its paper editor. Calendar keeps its Notion-style layout, continuous day scrolling, compact events, desktop inspector and phone bottom sheet, with Apple colors and controls.",
+    "colors": "Apple Dark and Apple Light map to the current HIG system colors, including blue #0088FF light / #0091FF dark, system grays and documented increased-contrast variants for readable text and white-on-blue actions. Exact source values are recorded in apple-system-colors.json. Material opacities are web adaptations; other optional theme palettes remain user-selectable.",
+    "navigation": "iPhone layout: floating bottom tabs for Today, Calendar, Tasks, Agent, and a More sheet. macOS layout: persistent sidebar and compact toolbar. Safe-area space prevents the tab bar covering calendar or composer controls."
+  }
+}

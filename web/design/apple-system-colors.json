@@ -1,0 +1,584 @@
+{
+  "source": "https://developer.apple.com/design/human-interface-guidelines/color",
+  "specification": "https://developer.apple.com/tutorials/data/design/human-interface-guidelines/color.json",
+  "retrieved": "2026-10-14",
+  "space": "sRGB",
+  "values": {
+    "colors-unified-accessible-blue-dark": {
+      "rgb": [
+        92,
+        184,
+        255
+      ],
+      "hex": "#5cb8ff"
+    },
+    "colors-unified-accessible-blue-light": {
+      "rgb": [
+        30,
+        110,
+        244
+      ],
+      "hex": "#1e6ef4"
+    },
+    "colors-unified-accessible-brown-dark": {
+      "rgb": [
+        219,
+        166,
+        121
+      ],
+      "hex": "#dba679"
+    },
+    "colors-unified-accessible-brown-light": {
+      "rgb": [
+        149,
+        109,
+        81
+      ],
+      "hex": "#956d51"
+    },
+    "colors-unified-accessible-cyan-dark": {
+      "rgb": [
+        109,
+        217,
+        255
+      ],
+      "hex": "#6dd9ff"
+    },
+    "colors-unified-accessible-cyan-light": {
+      "rgb": [
+        0,
+        126,
+        174
+      ],
+      "hex": "#007eae"
+    },
+    "colors-unified-accessible-green-dark": {
+      "rgb": [
+        74,
+        217,
+        104
+      ],
+      "hex": "#4ad968"
+    },
+    "colors-unified-accessible-green-light": {
+      "rgb": [
+        0,
+        137,
+        50
+      ],
+      "hex": "#008932"
+    },
+    "colors-unified-accessible-indigo-dark": {
+      "rgb": [
+        167,
+        170,
+        255
+      ],
+      "hex": "#a7aaff"
+    },
+    "colors-unified-accessible-indigo-light": {
+      "rgb": [
+        86,
+        74,
+        222
+      ],
+      "hex": "#564ade"
+    },
+    "colors-unified-accessible-mint-dark": {
+      "rgb": [
+        84,
+        223,
+        203
+      ],
+      "hex": "#54dfcb"
+    },
+    "colors-unified-accessible-mint-light": {
+      "rgb": [
+        0,
+        133,
+        117
+      ],
+      "hex": "#008575"
+    },
+    "colors-unified-accessible-orange-dark": {
+      "rgb": [
+        255,
+        160,
+        86
+      ],
+      "hex": "#ffa056"
+    },
+    "colors-unified-accessible-orange-light": {
+      "rgb": [
+        197,
+        83,
+        0
+      ],
+      "hex": "#c55300"
+    },
+    "colors-unified-accessible-pink-dark": {
+      "rgb": [
+        255,
+        138,
+        196
+      ],
+      "hex": "#ff8ac4"
+    },
+    "colors-unified-accessible-pink-light": {
+      "rgb": [
+        231,
+        18,
+        77
+      ],
+      "hex": "#e7124d"
+    },
+    "colors-unified-accessible-purple-dark": {
+      "rgb": [
+        234,
+        141,
+        255
+      ],
+      "hex": "#ea8dff"
+    },
+    "colors-unified-accessible-purple-light": {
+      "rgb": [
+        176,
+        47,
+        194
+      ],
+      "hex": "#b02fc2"
+    },
+    "colors-unified-accessible-red-dark": {
+      "rgb": [
+        255,
+        97,
+        101
+      ],
+      "hex": "#ff6165"
+    },
+    "colors-unified-accessible-red-light": {
+      "rgb": [
+        233,
+        21,
+        45
+      ],
+      "hex": "#e9152d"
+    },
+    "colors-unified-accessible-teal-dark": {
+      "rgb": [
+        59,
+        221,
+        236
+      ],
+      "hex": "#3bddec"
+    },
+    "colors-unified-accessible-teal-light": {
+      "rgb": [
+        0,
+        129,
+        152
+      ],
+      "hex": "#008198"
+    },
+    "colors-unified-accessible-yellow-dark": {
+      "rgb": [
+        254,
+        223,
+        67
+      ],
+      "hex": "#fedf43"
+    },
+    "colors-unified-accessible-yellow-light": {
+      "rgb": [
+        161,
+        106,
+        0
+      ],
+      "hex": "#a16a00"
+    },
+    "colors-unified-blue-dark": {
+      "rgb": [
+        0,
+        145,
+        255
+      ],
+      "hex": "#0091ff"
+    },
+    "colors-unified-blue-light": {
+      "rgb": [
+        0,
+        136,
+        255
+      ],
+      "hex": "#0088ff"
+    },
+    "colors-unified-brown-dark": {
+      "rgb": [
+        183,
+        138,
+        102
+      ],
+      "hex": "#b78a66"
+    },
+    "colors-unified-brown-light": {
+      "rgb": [
+        172,
+        127,
+        94
+      ],
+      "hex": "#ac7f5e"
+    },
+    "colors-unified-cyan-dark": {
+      "rgb": [
+        60,
+        211,
+        254
+      ],
+      "hex": "#3cd3fe"
+    },
+    "colors-unified-cyan-light": {
+      "rgb": [
+        0,
+        192,
+        232
+      ],
+      "hex": "#00c0e8"
+    },
+    "colors-unified-green-dark": {
+      "rgb": [
+        48,
+        209,
+        88
+      ],
+      "hex": "#30d158"
+    },
+    "colors-unified-green-light": {
+      "rgb": [
+        52,
+        199,
+        89
+      ],
+      "hex": "#34c759"
+    },
+    "colors-unified-indigo-dark": {
+      "rgb": [
+        109,
+        124,
+        255
+      ],
+      "hex": "#6d7cff"
+    },
+    "colors-unified-indigo-light": {
+      "rgb": [
+        97,
+        85,
+        245
+      ],
+      "hex": "#6155f5"
+    },
+    "colors-unified-mint-dark": {
+      "rgb": [
+        0,
+        218,
+        195
+      ],
+      "hex": "#00dac3"
+    },
+    "colors-unified-mint-light": {
+      "rgb": [
+        0,
+        200,
+        179
+      ],
+      "hex": "#00c8b3"
+    },
+    "colors-unified-orange-dark": {
+      "rgb": [
+        255,
+        146,
+        48
+      ],
+      "hex": "#ff9230"
+    },
+    "colors-unified-orange-light": {
+      "rgb": [
+        255,
+        141,
+        40
+      ],
+      "hex": "#ff8d28"
+    },
+    "colors-unified-pink-dark": {
+      "rgb": [
+        255,
+        55,
+        95
+      ],
+      "hex": "#ff375f"
+    },
+    "colors-unified-pink-light": {
+      "rgb": [
+        255,
+        45,
+        85
+      ],
+      "hex": "#ff2d55"
+    },
+    "colors-unified-purple-dark": {
+      "rgb": [
+        219,
+        52,
+        242
+      ],
+      "hex": "#db34f2"
+    },
+    "colors-unified-purple-light": {
+      "rgb": [
+        203,
+        48,
+        224
+      ],
+      "hex": "#cb30e0"
+    },
+    "colors-unified-red-dark": {
+      "rgb": [
+        255,
+        66,
+        69
+      ],
+      "hex": "#ff4245"
+    },
+    "colors-unified-red-light": {
+      "rgb": [
+        255,
+        56,
+        60
+      ],
+      "hex": "#ff383c"
+    },
+    "colors-unified-teal-dark": {
+      "rgb": [
+        0,
+        210,
+        224
+      ],
+      "hex": "#00d2e0"
+    },
+    "colors-unified-teal-light": {
+      "rgb": [
+        0,
+        195,
+        208
+      ],
+      "hex": "#00c3d0"
+    },
+    "colors-unified-yellow-dark": {
+      "rgb": [
+        255,
+        214,
+        0
+      ],
+      "hex": "#ffd600"
+    },
+    "colors-unified-yellow-light": {
+      "rgb": [
+        255,
+        204,
+        0
+      ],
+      "hex": "#ffcc00"
+    },
+    "ios-accessible-systemgray": {
+      "rgb": [
+        108,
+        108,
+        112
+      ],
+      "hex": "#6c6c70"
+    },
+    "ios-accessible-systemgray2": {
+      "rgb": [
+        142,
+        142,
+        147
+      ],
+      "hex": "#8e8e93"
+    },
+    "ios-accessible-systemgray2dark": {
+      "rgb": [
+        124,
+        124,
+        128
+      ],
+      "hex": "#7c7c80"
+    },
+    "ios-accessible-systemgray3": {
+      "rgb": [
+        174,
+        174,
+        178
+      ],
+      "hex": "#aeaeb2"
+    },
+    "ios-accessible-systemgray3dark": {
+      "rgb": [
+        84,
+        84,
+        86
+      ],
+      "hex": "#545456"
+    },
+    "ios-accessible-systemgray4": {
+      "rgb": [
+        188,
+        188,
+        192
+      ],
+      "hex": "#bcbcc0"
+    },
+    "ios-accessible-systemgray4dark": {
+      "rgb": [
+        68,
+        68,
+        70
+      ],
+      "hex": "#444446"
+    },
+    "ios-accessible-systemgray5": {
+      "rgb": [
+        216,
+        216,
+        220
+      ],
+      "hex": "#d8d8dc"
+    },
+    "ios-accessible-systemgray5dark": {
+      "rgb": [
+        54,
+        54,
+        56
+      ],
+      "hex": "#363638"
+    },
+    "ios-accessible-systemgray6": {
+      "rgb": [
+        235,
+        235,
+        240
+      ],
+      "hex": "#ebebf0"
+    },
+    "ios-accessible-systemgray6dark": {
+      "rgb": [
+        36,
+        36,
+        38
+      ],
+      "hex": "#242426"
+    },
+    "ios-accessible-systemgraydark": {
+      "rgb": [
+        174,
+        174,
+        178
+      ],
+      "hex": "#aeaeb2"
+    },
+    "ios-default-systemgray": {
+      "rgb": [
+        142,
+        142,
+        147
+      ],
+      "hex": "#8e8e93"
+    },
+    "ios-default-systemgray2": {
+      "rgb": [
+        174,
+        174,
+        178
+      ],
+      "hex": "#aeaeb2"
+    },
+    "ios-default-systemgray2dark": {
+      "rgb": [
+        99,
+        99,
+        102
+      ],
+      "hex": "#636366"
+    },
+    "ios-default-systemgray3": {
+      "rgb": [
+        199,
+        199,
+        204
+      ],
+      "hex": "#c7c7cc"
+    },
+    "ios-default-systemgray3dark": {
+      "rgb": [
+        72,
+        72,
+        74
+      ],
+      "hex": "#48484a"
+    },
+    "ios-default-systemgray4": {
+      "rgb": [
+        209,
+        209,
+        214
+      ],
+      "hex": "#d1d1d6"
+    },
+    "ios-default-systemgray4dark": {
+      "rgb": [
+        58,
+        58,
+        60
+      ],
+      "hex": "#3a3a3c"
+    },
+    "ios-default-systemgray5": {
+      "rgb": [
+        229,
+        229,
+        234
+      ],
+      "hex": "#e5e5ea"
+    },
+    "ios-default-systemgray5dark": {
+      "rgb": [
+        44,
+        44,
+        46
+      ],
+      "hex": "#2c2c2e"
+    },
+    "ios-default-systemgray6": {
+      "rgb": [
+        242,
+        242,
+        247
+      ],
+      "hex": "#f2f2f7"
+    },
+    "ios-default-systemgray6dark": {
+      "rgb": [
+        28,
+        28,
+        30
+      ],
+      "hex": "#1c1c1e"
+    },
+    "ios-default-systemgraydark": {
+      "rgb": [
+        142,
+        142,
+        147
+      ],
+      "hex": "#8e8e93"
+    }
+  }
+}

@@ -1,0 +1,956 @@
+/* A continuous workspace: page structure comes from spacing and dividers. */
+:root {
+  --workspace-gutter: clamp(24px, 2.6vw, 44px);
+  --workspace-topbar-height: 52px;
+}
+.workspace-main-wrap {
+  min-height: 100dvh;
+}
+.workspace-topbar {
+  height: var(--workspace-topbar-height);
+  padding-inline: var(--workspace-gutter);
+  background: var(--bg);
+}
+.workspace-main {
+  padding: 28px var(--workspace-gutter) 48px;
+}
+.workspace-view {
+  max-width: none;
+  margin: 0;
+}
+.workspace-brand {
+  font-weight: 500;
+  margin-bottom: 26px;
+}
+.workspace-search-launch {
+  background: transparent;
+  border-color: var(--rule);
+}
+.workspace-nav-item.active {
+  border-color: transparent;
+}
+.workspace-nav-item.active::before {
+  display: none;
+}
+.page-heading {
+  margin-bottom: 26px;
+  gap: 16px;
+}
+.page-heading h1,
+.docs-head h2.section,
+.settings > h2.section {
+  font: 400 clamp(28px, 2.2vw, 34px)/1.2 var(--serif);
+  letter-spacing: -0.035em;
+}
+.docs-head h2.section,
+.settings > h2.section {
+  margin-top: 0;
+}
+.btn,
+.icon-button {
+  border-radius: 5px;
+}
+
+/* Calendar is the workspace, with a single independently scrolling timeline. */
+.view-calendar .workspace-main {
+  padding: 0;
+  height: calc(100dvh - var(--workspace-topbar-height));
+  min-height: 440px;
+  display: flex;
+}
+.view-calendar .workspace-view {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+}
+.calendar-workspace {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+}
+.calendar-heading {
+  flex: none;
+  min-height: 72px;
+  margin: 0;
+  padding: 16px var(--workspace-gutter);
+  border-bottom: 1px solid var(--rule);
+}
+.calendar-heading h1 {
+  font-size: 28px;
+}
+.calendar-shell {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--bg);
+}
+.calendar-sidebar {
+  background: var(--bg);
+  padding-top: 22px;
+}
+.calendar-toolbar {
+  padding: 14px 20px 8px;
+}
+.calendar-context {
+  padding: 0 22px 10px;
+}
+.calendar-bottom-note {
+  padding-inline: 20px;
+  background: transparent;
+}
+.time-event {
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+  border-radius: 3px;
+}
+.time-event:hover {
+  transform: none;
+  box-shadow: none;
+}
+.calendar-event-chip {
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+  border-radius: 3px;
+}
+.agenda-event {
+  background: transparent;
+  border-top: 0;
+  border-right: 0;
+  border-bottom: 0;
+  border-radius: 0;
+}
+
+/* Keep the familiar cards on Overview and Tasks. */
+.ov-head {
+  justify-content: flex-end;
+  margin: -8px 0 12px;
+}
+.ov-head > h2 { display: none; }
+
+/* Libraries are collections of rows and sections, not nested containers. */
+.docs-head {
+  margin-bottom: 28px;
+}
+.docs-grid {
+  gap: 24px 28px;
+}
+.docs-grid .doc-card:not(.folder-card) {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  border-radius: 0;
+  padding: 18px 8px;
+  background: transparent;
+  min-height: 140px;
+  box-shadow: none;
+}
+.docs-grid .doc-card:not(.folder-card):hover {
+  background: var(--bg-2);
+  border-color: var(--accent-border);
+  transform: none;
+}
+.folder {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  border-radius: 0;
+  background: transparent;
+  margin-bottom: 22px;
+}
+.folder-head {
+  padding: 18px 8px;
+}
+.folder-body {
+  padding: 0;
+  border-top: 0;
+}
+.wiki-card {
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  border-radius: 0;
+  margin: 0;
+}
+.wiki-card:hover {
+  border-color: var(--rule);
+}
+.daily-note-card {
+  padding-block: 22px;
+}
+
+/* Keep a readable text measure without drawing a box around the document. */
+.docpage-scroll {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 20px 0 48px;
+}
+.docpage {
+  width: 900px;
+  padding: 36px clamp(20px, 4vw, 64px);
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.note-surface {
+  border: 0;
+  border-block: 1px solid var(--rule);
+  border-radius: 0;
+  background: transparent;
+}
+.note-surface:focus-within {
+  border-color: var(--rule-strong);
+}
+.daily-reader {
+  max-width: 1100px;
+  margin-inline: auto;
+}
+.quiz-card {
+  border: 0;
+  border-block: 1px solid var(--rule);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 24px 0;
+}
+.settings {
+  max-width: 1100px;
+}
+.set-block {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  border-radius: 0;
+  background: transparent;
+  padding: 26px 0;
+  margin: 26px 0 0;
+}
+.set-h {
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 500;
+}
+.theme-card {
+  border-radius: 5px;
+  box-shadow: none;
+}
+.change-record {
+  padding-block: 24px;
+}
+
+@media (max-width: 1180px) and (min-width: 761px) {
+  .calendar-toolbar {
+    padding-inline: 12px;
+  }
+  .calendar-context {
+    padding-inline: 14px;
+  }
+}
+@media (max-width: 760px),
+  (max-width: 1024px) and (max-height: 600px) and (pointer: coarse) {
+  :root {
+    --workspace-gutter: 18px;
+    --workspace-topbar-height: calc(56px + env(safe-area-inset-top));
+  }
+  .workspace-topbar {
+    height: auto;
+    padding: env(safe-area-inset-top) max(12px, env(safe-area-inset-right)) 0
+      max(12px, env(safe-area-inset-left));
+  }
+  .workspace-main {
+    padding: 20px max(18px, env(safe-area-inset-right))
+      calc(32px + env(safe-area-inset-bottom))
+      max(18px, env(safe-area-inset-left));
+  }
+  .page-heading {
+    margin-bottom: 22px;
+  }
+  .view-calendar .workspace-main {
+    height: auto;
+    min-height: calc(100svh - var(--workspace-topbar-height));
+    padding: 0;
+  }
+  .calendar-heading {
+    min-height: 68px;
+    padding: 12px max(16px, env(safe-area-inset-right)) 12px
+      max(16px, env(safe-area-inset-left));
+  }
+  .calendar-heading h1 {
+    font-size: 26px;
+  }
+  .calendar-shell {
+    border-radius: 0;
+  }
+  .calendar-toolbar {
+    padding: 12px 16px 8px;
+  }
+  .calendar-context {
+    padding: 0 16px 8px;
+    flex-wrap: nowrap;
+  }
+  .calendar-context > span {
+    width: auto;
+    white-space: nowrap;
+    font-size: 10px;
+  }
+  .calendar-search input {
+    min-height: 40px;
+  }
+  .calendar-view-enter {
+    overflow: visible;
+  }
+  .time-grid-scroller {
+    height: max(280px, calc(100svh - 355px - env(safe-area-inset-top)));
+    max-height: none;
+  }
+  .calendar-content {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .ov-grid {
+    gap: 20px;
+  }
+  .docs-grid {
+    gap: 16px;
+  }
+  .docpage-scroll {
+    padding: 12px 0 28px;
+  }
+  .docpage {
+    padding: 16px 0;
+  }
+  .quick-note-input {
+    border: 0;
+    border-block: 1px solid var(--rule);
+    border-radius: 0;
+    background: transparent;
+    padding-inline: 0;
+  }
+  .capture-calendar-link {
+    background: transparent;
+    border-inline: 0;
+    border-radius: 0;
+    padding-inline: 0;
+  }
+  .set-block {
+    padding-block: 22px;
+  }
+}
+
+/* Event inspector: compact, alongside the calendar, with no dimmed backdrop. */
+.calendar-workspace:has(> .event-inspector) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+.calendar-workspace:has(> .event-inspector) > .calendar-heading {
+  grid-column: 1 / -1;
+}
+.calendar-workspace:has(> .event-inspector) > .calendar-shell {
+  min-width: 0;
+}
+.event-inspector {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--rule);
+  background: var(--bg);
+  outline: none;
+}
+.event-inspector-heading {
+  padding: 12px 20px 20px;
+  border-bottom: 1px solid var(--rule);
+}
+.event-inspector-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.event-inspector-heading h2 {
+  font: 500 20px/1.4 var(--font);
+  letter-spacing: -0.02em;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.event-inspector-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.event-inspector-section {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 12px;
+}
+.event-inspector-section p {
+  margin: 8px 0 0;
+}
+.event-when {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.event-when > svg {
+  color: var(--muted);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.event-time-range {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--fg);
+  font-size: 14px;
+}
+.event-time-range small,
+.event-timezone {
+  font-size: 11px;
+  color: var(--muted);
+}
+.event-timezone {
+  display: block;
+  margin-top: 8px;
+}
+.event-repeat {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  color: var(--muted);
+  font-size: 11px;
+}
+.event-join {
+  display: flex;
+  width: 100%;
+  min-height: 40px;
+}
+.event-join > svg:last-child {
+  margin-left: auto;
+}
+.event-meeting-address {
+  display: block;
+  font-size: 11px;
+  color: var(--fg-soft);
+  margin-top: 10px;
+  text-decoration: none;
+}
+.event-meeting-address span {
+  color: var(--muted);
+  margin-left: 6px;
+}
+.event-field-label {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  margin-bottom: 7px;
+}
+.event-location,
+.event-organizer {
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+.event-guests {
+  margin-top: 12px;
+}
+.event-guests summary,
+.event-description summary {
+  cursor: pointer;
+  color: var(--fg-soft);
+}
+.event-guests ul {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+}
+.event-guests li {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 7px 0;
+  overflow-wrap: anywhere;
+}
+.event-guests li small {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+.event-description p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.event-calendar-name {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  overflow-wrap: anywhere;
+}
+.event-source-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+.event-inspector-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  border-top: 1px solid var(--rule);
+}
+.event-inspector-footer .task-delete {
+  margin-left: auto;
+}
+.compact-color-picker {
+  margin: 12px 0 0;
+  position: relative;
+}
+.event-color-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 0;
+  min-height: 30px;
+  border: 0;
+  background: transparent;
+  color: var(--fg-soft);
+  text-align: left;
+  font-size: 11px;
+}
+.event-color-trigger small {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 10px;
+}
+.event-color-trigger > svg {
+  transform: rotate(90deg);
+}
+.event-color-popover {
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  margin: 7px 0 0;
+  padding: 10px;
+  min-width: 0;
+  background: var(--panel);
+}
+.event-color-popover .event-color-default {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 4px 2px;
+  margin-bottom: 8px;
+  min-height: 24px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 11px;
+}
+.event-color-popover .event-color-options {
+  display: grid;
+  grid-template-columns: repeat(6, 28px);
+  gap: 6px;
+}
+.event-color-popover .event-color-options button {
+  width: 28px;
+  min-height: 28px;
+  height: 28px;
+  border-radius: 4px;
+  padding: 3px;
+}
+.event-color-popover .event-color-swatch > span {
+  width: 18px;
+  height: 18px;
+}
+.event-color-popover .field-hint {
+  margin: 8px 0 0;
+  font-size: 10px;
+  line-height: 1.5;
+}
+.calendar-chip-wrap,
+.agenda-event-wrap {
+  position: relative;
+}
+.time-event-wrap {
+  position: absolute;
+  z-index: 2;
+}
+.time-event-wrap > .time-event {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.calendar-quick-join {
+  position: absolute;
+  right: 4px;
+  top: 3px;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: var(--panel);
+  border: 1px solid var(--rule);
+  color: var(--fg);
+  opacity: 0;
+  text-decoration: none;
+}
+.time-event-wrap:hover .calendar-quick-join,
+.calendar-chip-wrap:hover .calendar-quick-join,
+.agenda-event-wrap:hover .calendar-quick-join,
+.calendar-quick-join:focus-visible {
+  opacity: 1;
+}
+.agenda-event-wrap > .calendar-quick-join {
+  top: 12px;
+  right: 12px;
+}
+.calendar-chip-wrap > .calendar-quick-join {
+  width: 22px;
+  height: 22px;
+  top: 1px;
+}
+.calendar-quick-join:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+@media (max-width: 1400px) {
+  .calendar-workspace:has(> .event-inspector) .calendar-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .calendar-workspace:has(> .event-inspector) .calendar-sidebar {
+    display: none;
+  }
+}
+@media (max-width: 760px),
+  (max-width: 1024px) and (max-height: 600px) and (pointer: coarse) {
+  .event-inspector-modal {
+    width: calc(100% - 16px);
+    max-height: calc(100dvh - 24px);
+    padding: 0;
+    border-radius: 8px;
+  }
+  .event-inspector-modal[open] {
+    display: flex;
+    flex-direction: column;
+  }
+  .event-inspector-modal .event-inspector-body {
+    overflow-y: auto;
+  }
+  .event-inspector-modal::backdrop {
+    backdrop-filter: none;
+    background: #0006;
+  }
+  .event-color-trigger {
+    min-height: 40px;
+  }
+  .event-color-popover .event-color-options {
+    grid-template-columns: repeat(6, 32px);
+    gap: 8px;
+  }
+  .event-color-popover .event-color-options button {
+    width: 32px;
+    min-height: 32px;
+    height: 32px;
+    padding: 5px;
+  }
+  .calendar-quick-join {
+    opacity: 1;
+  }
+  .time-event-wrap:has(.calendar-quick-join) .time-event {
+    padding-right: 30px;
+  }
+  .calendar-chip-wrap:has(.calendar-quick-join) .calendar-event-chip {
+    padding-right: 28px;
+  }
+}
+.ov-slot .card > .btn {
+  align-self: flex-start;
+}
+@media (max-width: 760px),
+  (max-width: 1024px) and (max-height: 600px) and (pointer: coarse) {
+  .view-calendar .workspace-main {
+    height: calc(100dvh - var(--workspace-topbar-height));
+    min-height: 560px;
+  }
+  .calendar-heading {
+    margin: 0;
+  }
+  .calendar-toolbar,
+  .calendar-context,
+  .calendar-phone-settings,
+  .calendar-week-strip {
+    flex-shrink: 0;
+  }
+  .calendar-view-enter {
+    min-height: 0;
+    overflow: auto;
+  }
+  .time-grid-scroller {
+    flex: 1;
+    height: auto;
+    min-height: 180px;
+  }
+  .view-calendar .workspace-main:has(.calendar-phone-settings[open]) {
+    height: auto;
+  }
+  .calendar-phone-settings[open] ~ .calendar-view-enter .time-grid-scroller {
+    flex: none;
+    height: 320px;
+  }
+}
+.event-inspector-footer:empty {
+  display: none;
+}
+
+/* Content adapts to the space available, with readable text on wide displays. */
+.workspace-main-wrap,
+.workspace-main,
+.workspace-view,
+.day-editor,
+.today-workspace > * {
+  min-width: 0;
+}
+.workspace-view {
+  max-width: 1600px;
+  margin-inline: auto;
+}
+.view-calendar .workspace-view {
+  max-width: none;
+  margin: 0;
+}
+.view-today .workspace-view {
+  max-width: 1440px;
+}
+.today-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 32px;
+  align-items: start;
+}
+.today-workspace .day-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+}
+.today-workspace .datenav,
+.today-workspace .editor-bar {
+  margin: 0;
+}
+.today-workspace .editor-bar {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.today-workspace .datenav .day {
+  font-size: clamp(19px, 1.6vw, 25px);
+  font-weight: 400;
+}
+.today-workspace .day-editor > :not(.datenav):not(.editor-bar) {
+  grid-column: 1 / -1;
+}
+.today-workspace .note-surface {
+  min-height: clamp(280px, 38vh, 420px);
+}
+.today-workspace .note-surface .ProseMirror {
+  min-height: clamp(280px, 38vh, 420px);
+}
+.today-workspace .voice-section {
+  margin-top: 8px;
+}
+.today-workspace > .voice-section {
+  margin: 0;
+}
+.today-workspace .quiz-card {
+  max-width: none;
+  margin: 0;
+}
+.today-workspace .voice-empty,
+.today-workspace .quiz-stem,
+.doc-card-title {
+  overflow-wrap: anywhere;
+}
+.docs-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(230px, 100%), 1fr));
+}
+.quiz-confidence {
+  flex-wrap: wrap;
+}
+.quiz-confidence input[type="range"] {
+  min-width: 80px;
+}
+@media (min-width: 761px) and (max-width: 1100px) {
+  .ov-grid[data-density="3"] {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .task-board {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 760px) {
+  .page-heading,
+  .docs-head,
+  .docpage-toolbar {
+    flex-wrap: wrap;
+  }
+  .folder-actions { opacity: 1; }
+  .folder-act { min-height: 44px; }
+}
+
+.event-extra-details > summary { display: none; }
+@media (max-width: 760px),
+  (max-width: 1024px) and (max-height: 600px) and (pointer: coarse) {
+  .event-inspector-modal {
+    width: min(480px, calc(100% - 16px));
+    max-height: calc(100dvh - 24px - env(safe-area-inset-top));
+    margin: auto auto max(8px, env(safe-area-inset-bottom));
+    border-radius: 16px;
+  }
+  .event-inspector-modal .event-inspector-heading {
+    padding: 8px 16px 12px;
+    flex-shrink: 0;
+  }
+  .event-inspector-modal .event-inspector-label { margin-bottom: 0; }
+  .event-inspector-modal .event-inspector-heading h2 {
+    font-size: 18px;
+    line-height: 1.35;
+  }
+  .event-inspector-modal .event-inspector-section { padding: 12px 16px; }
+  .event-inspector-modal .event-timezone { margin-top: 4px; }
+  .event-inspector-modal .event-join { min-height: 44px; }
+  .event-inspector-modal .event-meeting-address { display: none; }
+  .event-inspector-modal .event-extra-details > summary {
+    display: list-item;
+    padding: 14px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .event-inspector-modal .event-extra-details {
+    border-bottom: 1px solid var(--rule);
+  }
+  .event-inspector-modal .event-inspector-footer {
+    flex-shrink: 0;
+    padding: 10px 16px;
+  }
+  .event-inspector-modal .event-inspector-footer :is(.btn, .task-delete) {
+    min-height: 44px;
+  }
+  .event-color-popover .event-color-options {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 2px;
+  }
+  .event-color-popover .event-color-options button {
+    width: 100%;
+    min-height: 44px;
+    height: 44px;
+  }
+}
+.cmdk-input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.calendar-gesture-surface,
+.time-grid-scroller,
+.time-slot {
+  touch-action: pan-x pan-y;
+}
+.cmdk-search-row:focus-within {
+  background: color-mix(in srgb, var(--accent) 4%, transparent);
+  box-shadow: inset 0 -1px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+/* Text entry uses a gentle fill change, never an inset rectangular focus ring. */
+input:not([type="checkbox"]):not([type="radio"]):focus,
+textarea:focus,
+[contenteditable="true"]:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+input:not([type="checkbox"]):not([type="radio"]):focus-visible,
+textarea:focus-visible {
+  background-color: color-mix(in srgb, var(--accent) 5%, var(--bg));
+}
+.agent-composer textarea:focus-visible,
+.agent-composer textarea:focus,
+.cmdk-input:focus { background: transparent; }
+.agent-composer:focus-within { background: color-mix(in srgb, var(--accent) 5%, var(--panel-2)); }
+
+/* A single chat canvas, continuous with the workspace rather than a nested card. */
+.view-agent .workspace-main {
+  padding: 0;
+  height: calc(100dvh - var(--workspace-topbar-height));
+  min-height: 420px;
+  display: flex;
+}
+.view-agent .workspace-view { display: flex; flex: 1; min-height: 0; min-width: 0; }
+.agent-workspace { min-height: 0; width: 100%; }
+.agent-heading { flex: none; min-height: 80px; padding: 20px var(--workspace-gutter) 12px; margin: 0; }
+
+.agent-heading p { font-size: 12px; }
+.agent-layout { flex: 1; min-height: 0; grid-template-columns: 200px minmax(0, 1fr); border: 0; background: transparent; }
+.agent-chat { min-height: 0; height: 100%; }
+.agent-messages { min-height: 0; padding: 28px clamp(24px, 4vw, 64px) 20px; overscroll-behavior: contain; }
+.agent-message { max-width: 760px; margin-bottom: 28px; }
+.agent-message.user > p { border: 0; border-radius: 18px; background: var(--panel-2); padding: 12px 16px; font-size: 14px; }
+.agent-message.assistant .markdown { font-size: 14px; line-height: 1.75; }
+.agent-message > span { font-size: 10px; }
+.agent-empty { width: min(100%, 520px); }
+.agent-empty-icon { border: 0; background: transparent; color: var(--muted); }
+.agent-empty h2 { font: 400 28px/1.25 var(--serif); }
+.agent-starters { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.agent-starters button { flex: 0 1 auto; min-height: 38px; border: 0; background: var(--panel); font-size: 12px; }
+.agent-starters button svg { display: none; }
+.agent-composer { flex: none; width: min(760px, calc(100% - 48px)); margin: 8px auto 24px; padding: 16px; box-shadow: none; border: 1px solid var(--rule); border-radius: 20px; }
+.agent-composer textarea { font-size: 15px; }
+.agent-composer > div > span { font-size: 10px; color: var(--muted); }
+/* Conversation history stays quiet and uses Cortex's existing typefaces. */
+.agent-history { min-width: 0; min-height: 0; padding: 12px 12px 24px 20px; overflow-y: auto; }
+.agent-history-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.agent-history-heading .eyebrow { margin: 0; color: var(--muted); }
+.agent-history-heading button { display: grid; place-items: center; width: 36px; height: 36px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; }
+.agent-history nav { display: grid; gap: 4px; }
+.agent-history-item { display: flex; gap: 8px; width: 100%; min-width: 0; min-height: 40px; padding: 10px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
+.agent-history-item > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.agent-history-item[aria-current], .agent-history-item:hover, .agent-history-heading button:hover { background: var(--panel); color: var(--fg); }
+.agent-history-toggle { display: none; }
+.agent-chat-pending { margin-left: auto; }
+.agent-attachments { display: flex; flex-wrap: wrap; gap: 8px; max-height: 112px; overflow-y: auto; list-style: none; margin: 0 0 12px; padding: 0; }
+.agent-attachment { display: flex; flex: 0 1 auto; min-width: 0; max-width: min(240px, 100%); border: 1px solid var(--rule); border-radius: 9px; background: var(--bg); }
+.agent-attachment button { color: var(--fg-soft); font: inherit; font-size: 12px; border: 0; background: transparent; cursor: pointer; }
+.agent-attachment-open { min-width: 0; display: flex; align-items: center; gap: 8px; padding: 9px 4px 9px 10px; }
+.agent-attachment-open svg { flex-shrink: 0; color: var(--muted); }
+.agent-attachment-open span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.agent-attachment-open small { flex-shrink: 0; font-size: 9px; color: var(--muted); }
+.agent-attachment-remove { display: grid; place-items: center; flex: 0 0 28px; border-radius: 0 8px 8px 0; }
+.agent-attachment button:hover { color: var(--fg); background: var(--panel); }
+.agent-storage-error { margin: 0 24px 8px; font-size: 12px; color: var(--err-bright); }
+@media (max-width: 760px) {
+  .agent-heading { min-height: 64px; padding: 14px 20px 8px; }
+  .agent-layout { display: flex; flex-direction: column; }
+  .agent-chat { flex: 1; min-height: 0; height: auto; }
+  .agent-history-toggle { display: inline-flex; min-height: 44px; }
+  .agent-history { display: none; padding: 0 14px 12px; max-height: 190px; flex-shrink: 0; }
+  .agent-history.is-open { display: block; }
+  .agent-history-item, .agent-history-heading button { min-height: 44px; }
+  .agent-history-heading button { width: 44px; }
+  .agent-attachment { max-width: min(260px, 100%); }
+  .agent-attachment-open { min-height: 44px; }
+  .agent-attachment-remove { flex-basis: 44px; }
+  .agent-messages { padding: 20px; }
+  .agent-composer { position: static; width: calc(100% - 28px); margin: 6px auto max(14px, env(safe-area-inset-bottom)); padding: 12px; }
+  .agent-composer textarea { font-size: 16px; }
+  .agent-empty h2 { font-size: 24px; }
+  .agent-starters { flex-direction: column; }
+}

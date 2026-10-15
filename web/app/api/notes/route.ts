@@ -1,3 +1,4 @@
+import { readAuthorized } from "@/lib/apiauth";
 import { NextResponse } from "next/server";
 import { readVaultFile, writeVaultFile, listVaultDir } from "@/lib/storage";
 import { parseNoteDoc, firstParagraph, slugify } from "@/lib/parse";
@@ -10,7 +11,8 @@ export const dynamic = "force-dynamic";
 const rel = (slug: string) => `sources/notes/${slug}.md`;
 
 // GET /api/notes → list all persistent documents (live from the vault).
-export async function GET() {
+export async function GET(req: Request) {
+  if (!readAuthorized(req)) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const slugs = await listVaultDir("sources/notes");
   const notes: NoteDocMeta[] = [];
   for (const slug of slugs) {
@@ -23,6 +25,7 @@ export async function GET() {
       created: d.created,
       updated: d.updated,
       preview: firstParagraph(d.body, 100),
+      folder: d.folder,
     });
   }
   notes.sort((a, b) => (b.updated || "").localeCompare(a.updated || ""));

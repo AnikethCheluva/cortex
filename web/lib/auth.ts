@@ -1,26 +1,39 @@
-// Password login for the deployment. SERVER-ONLY (imports node:crypto).
+// Login for the deployment. SERVER-ONLY (imports node:crypto).
 //
-// Set APP_PASSWORD to turn login on. Leave it unset and the app stays open —
-// which is the right default for a local clone or a private demo.
+// Two ways in, both optional:
+//   • APP_PASSWORD  — a shared password (the sign-in form).
+//   • Google        — "Sign in with Google", restricted to ALLOWED_EMAILS.
+//                     See lib/googleauth.ts.
+// With neither configured the app stays open, which is the right default for a
+// local clone or a private demo.
 //
 // The session is stateless: the cookie holds an HMAC of a fixed string keyed by
-// APP_PASSWORD, so there is no session store to run and rotating the password
-// invalidates every existing session. The cookie is httpOnly, so page scripts
-// cannot read it.
+// AUTH_SECRET (falling back to APP_PASSWORD), so there is no session store to
+// run and rotating the secret invalidates every existing session. The cookie is
+// httpOnly, so page scripts cannot read it.
 import { createHmac, timingSafeEqual } from "crypto";
+import { googleLoginConfigured } from "./googleauth";
 
 export const SESSION_COOKIE = "cortex_session";
 const SESSION_PAYLOAD = "cortex-session-v1";
 const MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
-export function authEnabled(): boolean {
+/** The key sessions are signed with. Google-only deployments set AUTH_SECRET. */
+export function sessionSecret(): string {
+  return process.env.AUTH_SECRET || process.env.APP_PASSWORD || "";
+}
+
+export function passwordLoginEnabled(): boolean {
   return Boolean(process.env.APP_PASSWORD);
 }
 
+/** Is a sign-in required at all? True if either method is usable. */
+export function authEnabled(): boolean {
+  return passwordLoginEnabled() || googleLoginConfigured();
+}
+
 function expectedToken(): string {
-  return createHmac("sha256", process.env.APP_PASSWORD || "")
-    .update(SESSION_PAYLOAD)
-    .digest("hex");
+  return createHmac("sha256", sessionSecret()).update(SESSION_PAYLOAD).digest("hex");
 }
 
 function safeEqual(a: string, b: string): boolean {

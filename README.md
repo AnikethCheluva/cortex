@@ -1,180 +1,105 @@
-<p align="center">
-  <img src="docs/images/social-preview.png" alt="Cortex — a second brain for your notes" width="820">
-</p>
+# Cortex
 
-<p align="center">
-  <b><a href="#run-it">Run it</a> · <a href="#point-it-at-your-notes">Your notes</a> · <a href="#features">Features</a> · <a href="#setup">Setup</a></b>
-</p>
+### A little more room to think.
 
-> "Obsidian is the IDE, the LLM is the programmer, the wiki is the codebase."
+An open-source workspace for your notes, calendar, tasks, and a wiki-grounded Codex assistant. Apple Dark by default, with responsive desktop and phone layouts.
 
-You write raw notes. Claude compiles them into a linked, cited wiki. A web app, a
-spaced-repetition engine, and a calendar sit on top. Git is the source of truth.
+**[Explore the showcase](https://anikethcheluva.github.io/cortex/)** · **[Setup & deployment](web/DEPLOY.md)** · **[Connect Codex](tooling/cortex-codex-bridge/README.md)** · **[Feature guide](docs/FEATURES.md)**
 
-## Run it
+Cortex brings raw capture → connected knowledge → scheduled action into one workspace. Your source notes and synthesized wiki stay in Markdown. The public repository contains application code, an empty starter, and fictional demo content—not a personal vault. The showcase is a static site, not a shared Cortex instance.
 
-1. `git clone https://github.com/AnikethCheluva/cortex && cd cortex/web`
-2. `npm install`
-3. `npm run dev`
+## Quick start
 
-Open http://localhost:3000. It runs on the bundled demo vault. Total time: about 2 minutes.
+Requires Node.js 22+ and npm.
 
-![Cortex — Overview and recall dashboard](docs/images/overview.png)
-
-## Point it at your notes
-
-Pick one. The helper writes `VAULT_PATH` to `web/.env.local`.
-
-1. **Your own vault** — `node scripts/use-vault.mjs /path/to/your/vault` (a folder with `sources/` and `wiki/`).
-2. **Empty start** — the default. Just run `npm run dev`.
-3. **The worked demo** — `node scripts/use-vault.mjs examples/demo-vault`.
-
-## How it works
-
-```
-sources/   →  INPUT.  You write raw notes, by life area.
-wiki/      →  OUTPUT. Claude builds the linked, cited pages.
-CLAUDE.md  →  RULES.  How sources become the wiki.
+```sh
+git clone https://github.com/AnikethCheluva/cortex.git
+cd cortex/web
+npm ci
+npm run dev
 ```
 
-You never hand-edit the wiki. A new note triggers an ingest. Claude creates and
-links pages, flags contradictions, and updates the index. Every claim cites a source.
+Open http://localhost:3000. No account, AI key, or database is required for the local starter. Calendar and Codex features need your own connections.
 
-## Features
+To explore the fictional demo, run from the repository root:
 
-| Feature | What it does |
-|---|---|
-| **Daily notes** | Dated notes with a rich editor, checkboxes, and inline LaTeX. |
-| **Voice notes** | Dictate with the on-device Web Speech API — no key, no upload. |
-| **Recall** | Keyless FSRS. Claude writes cards from your notes and grades answers. A dashboard tracks true retention. |
-| **Calendar** | Google + Outlook via client-side OAuth. Plus a toggleable "Planned" overlay of project deliverables. |
-| **Wiki** | Interlinked pages, one concept each, filed by type. |
-| **Tasks** | A git-backed task board with projects and priorities. |
-| **Docs** | Google-Docs-style long-form documents, saved as wiki sources. |
-| **Notion import** | Pull Notion pages and databases in as markdown sources. |
-| **Themes** | Six palettes, including a light one. Switch from the header. |
-| **Customizable** | Reorder or hide tabs, and arrange the Overview widget board. |
-| **Login** | Optional password gate, enforced on writes as well as the UI. |
-| **Clients** | Raycast, iOS Shortcuts, and a Slack bot. |
-
-<table>
-  <tr>
-    <td><img src="docs/images/today.png" alt="Today — recall quiz + voice notes"></td>
-    <td><img src="docs/images/calendar.png" alt="Calendar with the Planned overlay"></td>
-  </tr>
-  <tr>
-    <td><img src="docs/images/wiki.png" alt="Wiki pages by type"></td>
-    <td><img src="docs/images/tasks.png" alt="Task board"></td>
-  </tr>
-</table>
-
-Everything is markdown and JSON in git. The web UI edits the files. See it all
-populated with `node scripts/use-vault.mjs examples/demo-vault`.
-
-## How recall works
-
-Cortex turns your notes into active-recall flashcards and schedules each one for
-the moment just before you would forget it. This is spaced repetition, built in.
-
-**A card is made from your notes.** On each ingest, Claude reads what you wrote
-and writes atomic question-and-answer cards. Each card is one fact, grounded in a
-quote from the source.
-
-**You review on the Today tab.** The day's quiz shows one question at a time.
-Recall the answer, type it, then reveal the reference to check yourself. Rate how
-sure you were.
-
-**Grading needs no API key.** The app only captures your answer. The next ingest —
-which *is* the LLM — grades it against the card's reference answer.
-
-**FSRS picks the next date.** Each card carries a memory model (stability +
-difficulty). FSRS schedules the next review to hit a target recall probability,
-90% by default — the point where the review is hardest and sticks best. A card you
-skip is never penalized. It stays due and comes back, most-at-risk first.
-
-**The dashboard tracks retention.** The Overview tab shows true 30-day retention on
-graduated cards, your review streak, a due forecast, memory-stability spread, and
-confidence calibration.
-
-## Make it yours
-
-Open **Settings** (the gear, top right). Everything is saved per browser and
-never touches the repo.
-
-- **Theme** — six palettes (Notebook, Midnight, Graphite, Forest, Plum, and the
-  light Parchment). Switch from the header or Settings → Appearance.
-- **Tabs** — reorder the nav, or hide tabs you never open.
-- **Overview widgets** — reorder, hide, and add widgets: streak, tasks, today's
-  note, knowledge base, upcoming deliverables, recent docs, activity, recall.
-  Pick 2 or 3 cards per row.
-
-## Setup
-
-Everything below is optional. The app works without it.
-
-### Require a login
-
-Set one environment variable:
-
-```
-APP_PASSWORD=your-password
+```sh
+node scripts/use-vault.mjs examples/demo-vault
+cd web
+npm run dev
 ```
 
-The app then opens on a sign-in screen. The session is a stateless HMAC in an
-httpOnly cookie, and the **write API enforces it server-side** — so it gates real
-access, not just the interface. Leave it unset and the app opens with no login.
+For your own content, keep a **separate private vault** outside this public checkout:
 
-### Import from Notion
-
-Settings → **Notion import** pulls Notion pages and databases into
-`sources/notion/` as markdown, so the next `/ingest` compiles them into the wiki
-like any other source.
-
-1. Create an internal integration at [notion.so/my-integrations](https://www.notion.so/my-integrations) and copy the secret.
-2. In Notion, open a page → **⋯ → Connections →** your integration. It only sees pages shared with it.
-3. Paste the secret in Settings, load your pages, tick what you want, import.
-
-The secret stays in your browser and is passed per request — never committed,
-never stored on the server.
-
-### Google Calendar
-
-Full steps + Outlook: [`web/CALENDAR.md`](web/CALENDAR.md). Short version:
-
-1. [Google Cloud Console](https://console.cloud.google.com/) → enable the **Google Calendar API**.
-2. **OAuth consent screen** → *External* → add your account as a **Test user**.
-3. **Credentials** → **OAuth client ID** → **Web application**. Add your origins to **Authorized JavaScript origins**: `https://<your-project>.vercel.app` and `http://localhost:3000`.
-4. Set `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in Vercel. Redeploy.
-
-> **`Error 403: access_denied`?** Add your Google account as a **Test user** (step 2). Match the origin exactly — no trailing slash.
-
-### Install on iPhone (home-screen app)
-
-1. Open your deployed URL in **Safari**.
-2. **Share** → **Add to Home Screen** → **Add**.
-
-It launches full-screen with the dark theme. For one-tap capture, add the [iOS Shortcuts](clients/shortcuts/README.md).
-
-### Slack bot
-
-Full steps: [`tooling/slackbot/README.md`](tooling/slackbot/README.md). It turns `/wiki <verb>` into a headless Claude run on your vault.
-
-### Deploy the web app
-
-Set `GITHUB_TOKEN` + `GITHUB_REPO` so the app commits your edits. See [`web/.env.example`](web/.env.example) and [`web/DEPLOY.md`](web/DEPLOY.md).
-
-## Layout
-
-```
-web/                 Next.js web app — the main interface
-clients/             Raycast extension + iOS Shortcuts
-tooling/             The Slack bot (setup + env)
-.claude/             Slash commands that drive Claude's wiki work
-examples/vault/      Empty starter vault (the default)
-examples/demo-vault/ The worked demo (optional, deletable)
-CLAUDE.md            The rules: how sources become the wiki
+```sh
+node scripts/use-vault.mjs /absolute/path/to/your-private-vault
 ```
 
-## License
+This writes a gitignored local setting. Cortex never automatically reads a parent directory. Do not copy your real notes into the examples directories: those are tracked public fixtures.
 
-MIT — see [LICENSE](LICENSE).
+## What’s inside
+
+| Area | Features |
+| --- | --- |
+| Today & Overview | Single-column daily capture, voice notes, task progress, configurable overview widgets and cards |
+| Calendar | Google + Outlook, per-event colors, meeting links, day/3-day/week/month/agenda views, continuous day-snapped scrolling, cached event ranges |
+| Phone calendar | Compact week-snapped month dropdown, header follows the browsed month, calendar-source dropdown, date-number Today button, bottom event sheet with Join meeting |
+| Tasks | List and board views, priorities, due dates, estimated minutes, inline updates, filters, compact mobile actions |
+| Auto timebox | Codex-assisted duration estimates, priority-aware placement around busy events, explicit deadline handling, inferred due dates when missing |
+| Agent | Separate conversations, chat history, wiki context attachments, pinned pages, slim composer, grounded answers |
+| Command-K | Workspace search, automatic search/prompt intent detection, inline agent answers, supported commands including timeboxing |
+| Docs | Paper-style rich editor, Markdown storage, LaTeX equations, formatting controls, folders with Finder-inspired icons |
+| Wiki | Curated and A–Z browsing, tags, backlinks, source references, global search, pin-to-Agent |
+| Recall & Activity | Spaced-repetition quizzes, grading/scheduling tools, charts, change history and diffs |
+| Appearance | Apple Dark / Apple Light plus additional palettes, system typography, glass controls, reduced-motion support |
+| Integrations | Calendar reconnect in Settings, Notion import, optional transcription provider, Raycast, Shortcuts, Slack capture tooling |
+
+On phones, centered headers, floating search, compact menus, and a floating tab bar keep the content in focus. The tab bar hides while typing. See the [full feature guide](docs/FEATURES.md) for behavior and limits.
+
+## Connect your own Codex account
+
+The optional local companion talks to [`codex app-server`](https://developers.openai.com/codex/app-server/) using the Codex account signed in on your machine. It sends the selected context to Codex for answers or structured estimates. Your plan’s Codex eligibility and usage limits apply; a ChatGPT subscription does **not** provide an OpenAI API key or API credits.
+
+The companion is restricted to answering and estimating. Cortex performs its supported UI actions and schedule writes. It is not an unrestricted remote terminal. Read the [companion setup guide](tooling/cortex-codex-bridge/README.md).
+
+## Keep your workspace private
+
+- Keep your vault in a separate **private repository** or local directory. Keep tokens and credentials in environment variables.
+- For hosted private data, configure `APP_PASSWORD` or allowlisted Google login, or put the **entire deployment** behind an access proxy. A hard-to-guess URL is not access control.
+- Server rendering checks the session before loading vault content; data GET routes and write APIs enforce configured authentication. With no authentication configured, the app is open—use that only locally or with synthetic data.
+- Calendar, chat history, and context selections use browser storage. Use a trusted browser profile; they are not automatically synchronized across devices.
+- The optional Convex mirror requires its own authenticated identity and email allowlist. The app password cookie is not a Convex credential. Leave it disabled unless you implement that separate authentication connection.
+- Do not publish `.env` files, bridge state, private screenshots, or personal vault exports. The public-content check catches common mistakes but is not a substitute for reviewing your outgoing diff.
+
+See [privacy and deployment](web/DEPLOY.md). The landing-page workflow uploads **only `site/`**, never the application or a vault.
+
+## Project layout
+
+```text
+web/                         Next.js application
+site/                        Static Apple Dark showcase (GitHub Pages)
+tooling/cortex-codex-bridge/  Optional local Codex companion
+clients/                     Raycast and iOS integrations
+tooling/slackbot/             Optional capture tooling
+examples/vault/              Empty starter and templates
+examples/demo-vault/         Fictional demo content
+scripts/                     Vault selection and public-content checks
+```
+
+The knowledge workflow is described in [CLAUDE.md](CLAUDE.md). Source files are captures; the wiki is a derived layer. Agent chat does not automatically compile your whole wiki—use the repository’s ingest workflow for that.
+
+## Development
+
+```sh
+cd web
+npm test
+npm run build
+# From the repository root:
+node --test tooling/cortex-codex-bridge/*.test.mjs
+node scripts/check-public.mjs
+python3 -m http.server 8080 --directory site
+```
+
+The showcase has no analytics, account connection, or runtime data API. All visible examples are fictional. Apple and Notion references describe interface inspiration; Cortex is an independent project.
+
+MIT licensed. See [LICENSE](LICENSE).

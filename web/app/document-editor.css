@@ -1,0 +1,134 @@
+/* Docs has a paper surface; the rest of the workspace remains edge-to-edge. */
+.doc-editor { min-width: 0; }
+.doc-editor .doc-bar { margin-bottom: 12px; }
+.doc-editor .doc-title-input {
+  font-family: var(--font);
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 500;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+.docpage-toolbar {
+  top: 8px;
+  z-index: 15;
+  gap: 4px;
+  padding: 8px;
+  margin-bottom: 0;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--panel-2);
+  box-shadow: 0 2px 8px #0000000a;
+}
+.docpage-toolbar .dtb { min-height: 34px; height: 34px; }
+.doc-style-picker { padding-right: 8px; border-right: 1px solid var(--rule); }
+.doc-style-picker select {
+  max-width: 140px;
+  height: 34px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--fg-soft);
+  font: inherit;
+  font-size: 12px;
+  padding: 0 8px;
+}
+.doc-style-picker option { background: var(--panel); color: var(--fg); }
+.docpage-toolbar .dtb-group { padding-right: 5px; }
+.doc-format-tools { display: contents; }
+.doc-equation-button { gap: 6px; white-space: nowrap; }
+.doc-equation-button > span { font-family: var(--serif); font-size: 21px; }
+.docpage-scroll {
+  min-width: 0;
+  overflow-x: auto;
+  padding: 32px 24px 48px;
+  background: color-mix(in srgb, var(--bg-2) 70%, var(--bg));
+  border: 0;
+  border-radius: 0;
+}
+.docpage {
+  width: 816px;
+  max-width: 100%;
+  min-height: 1056px;
+  margin: 0 auto;
+  padding: 80px 84px 96px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 2px;
+  background: var(--panel);
+  box-shadow: 0 3px 16px #00000018, 0 1px 3px #00000012;
+}
+.docpage .ProseMirror {
+  min-height: 875px;
+  font-size: 16px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+.docpage .ProseMirror > :first-child { margin-top: 0; }
+.docpage .milkdown-code-block { max-width: 100%; }
+.docpage .katex-display { overflow-x: auto; overflow-y: hidden; padding-block: 6px; }
+.docpage .ProseMirror .katex { overflow-wrap: normal; }
+.docpage-status {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  padding: 12px 4px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.equation-dialog {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100dvh - 48px);
+  margin: auto;
+  padding: 24px;
+  overflow-y: auto;
+  border: 1px solid var(--rule-strong);
+  border-radius: 14px;
+  background: var(--panel);
+  color: var(--fg);
+  box-shadow: 0 20px 80px #0005;
+}
+.equation-dialog::backdrop { background: #0006; backdrop-filter: blur(4px); }
+.equation-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.equation-heading h2 { margin: 0; font-family: var(--font); font-size: 18px; font-weight: 500; }
+.equation-heading button { font-size: 24px; }
+.equation-modes { display: flex; gap: 20px; border: 0; padding: 0; margin: 0 0 20px; }
+.equation-modes label { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; cursor: pointer; }
+.equation-modes input { accent-color: var(--accent); }
+.equation-label { display: block; font-size: 12px; margin-bottom: 8px; color: var(--muted); }
+.equation-dialog textarea {
+  width: 100%;
+  min-height: 110px;
+  resize: vertical;
+  padding: 12px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.6;
+}
+.equation-help { margin: 8px 0 16px; font-size: 12px; line-height: 1.6; color: var(--muted); }
+.equation-preview { display: grid; place-items: center; min-height: 100px; padding: 20px 12px; border: 1px solid var(--rule); border-radius: 8px; overflow-x: auto; }
+.equation-preview > span { font-size: 13px; color: var(--muted); }
+.equation-preview p { color: var(--err); font-size: 12px; overflow-wrap: anywhere; }
+.equation-preview .katex-display { margin: 0; }
+.equation-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+@media (max-width: 760px) {
+  .doc-editor .doc-bar { gap: 8px; flex-wrap: wrap; }
+  .docpage-toolbar { position: relative; top: auto; border-radius: 8px; gap: 4px; }
+  .doc-equation-button { margin-left: auto; }
+  .doc-format-tools { display: flex; order: 2; width: 100%; gap: 4px; overflow-x: auto; padding-block: 4px; scrollbar-width: thin; }
+  .doc-format-tools .dtb-group { flex-shrink: 0; }
+  .docpage-toolbar .dtb, .doc-style-picker select { min-width: 40px; min-height: 40px; height: 40px; }
+  .docpage-scroll { padding: 16px 8px 24px; }
+  .docpage { min-height: 75svh; padding: 32px 24px 48px; }
+  .docpage .ProseMirror { min-height: 65svh; font-size: 16px; }
+  .docpage .milkdown .ProseMirror h1 { font-size: 30px; }
+  .docpage .milkdown .ProseMirror h2 { font-size: 25px; }
+  .docpage .milkdown .ProseMirror h3 { font-size: 20px; }
+  .docpage-status { font-size: 10px; }
+  .equation-dialog { padding: 20px; }
+  .equation-dialog textarea { font-size: 16px; }
+  .equation-dialog button, .equation-modes label { min-height: 44px; }
+}

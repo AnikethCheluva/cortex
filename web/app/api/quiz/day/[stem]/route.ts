@@ -1,3 +1,4 @@
+import { readAuthorized } from "@/lib/apiauth";
 import { NextResponse } from "next/server";
 import matter from "gray-matter";
 import { readVaultFile } from "@/lib/storage";
@@ -11,7 +12,8 @@ export const dynamic = "force-dynamic";
 // GET → a given day's quiz for READ-ONLY review in the Daily tab. Includes the
 // reference answer + rubric (the day is a historical snapshot, so revealing is
 // fine). Today's note is answered interactively via /api/quiz/today instead.
-export async function GET(_req: Request, { params }: { params: Promise<{ stem: string }> }) {
+export async function GET(req: Request, { params }: { params: Promise<{ stem: string }> }) {
+  if (!readAuthorized(req)) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const { stem } = await params;
   if (stem.includes("/") || stem.includes("..")) {
     return NextResponse.json({ error: "bad stem" }, { status: 400 });

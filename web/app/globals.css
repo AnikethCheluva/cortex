@@ -42,7 +42,7 @@
   --color-popover: var(--panel-2);
   --color-popover-foreground: var(--fg);
   --color-primary: var(--accent);
-  --color-primary-foreground: #1a1710;
+  --color-primary-foreground: var(--accent-ink);
   --color-secondary: var(--panel-2);
   --color-secondary-foreground: var(--fg-soft);
   --color-muted: var(--panel-2);
@@ -104,7 +104,7 @@
   --popover: var(--panel-2);
   --popover-foreground: var(--fg);
   --primary: var(--accent);
-  --primary-foreground: #1a1710;
+  --primary-foreground: var(--accent-ink);
   --secondary: var(--panel-2);
   --secondary-foreground: var(--fg-soft);
   --muted-foreground: var(--muted);
@@ -146,34 +146,34 @@
 }
 
 /* ======================================================================
-   Cortex — dark "notebook" theme.
-   Warm charcoal paper, ink-cream text, serif display headings, faint ruled
-   lines + a red margin rule on writing surfaces. One palette, driven by vars.
+   Cortex — default Slate palette.
+   Inky charcoal surfaces, softened lavender accents, and readable text.
    ====================================================================== */
 :root {
+  --accent-ink: #15141c;
   /* paper + ink */
-  --bg: #14130d;
-  --bg-2: #181712;
-  --panel: #1d1c15;
-  --panel-2: #232118;
-  --fg: #ece6d6;
-  --fg-soft: #d6cfbe;
-  --muted: #968d79;
-  --faint: #6f6857;
+  --bg: #17171f;
+  --bg-2: #1c1c27;
+  --panel: #222232;
+  --panel-2: #29293b;
+  --fg: #f1f0f6;
+  --fg-soft: #dcd9e7;
+  --muted: #a6a4b5;
+  --faint: #898798;
 
   /* ruling + edges */
-  --rule: #2c2a20;
-  --rule-strong: #3a3729;
-  --margin: #8a4636; /* the red notebook margin line */
+  --rule: #353444;
+  --rule-strong: #504e64;
+  --margin: #756f8e; /* the red notebook margin line */
 
   /* accents */
-  --accent: #d8b15a; /* brass / pencil-gold — active + primary */
-  --accent-soft: #2a2415;
-  --accent-border: #4a3f1f;
-  --link: #8fb0dd; /* ink blue */
-  --link-soft: #1c2430;
+  --accent: #c2b7e8; /* soft lavender — active + primary */
+  --accent-soft: #302d48;
+  --accent-border: #5c5680;
+  --link: #b9c4f2;
+  --link-soft: #2d3048;
 
-  --done-fg: #6f6857;
+  --done-fg: #898798;
   --age-warm: #d29a4a;
   --age-hot: #e0715e;
 
@@ -202,33 +202,11 @@
 }
 
 /* ======================================================================
-   Themes. `:root` above is the default ("notebook"); each block below
+   Themes. `:root` above is the default ("slate"); each block below
    re-declares the same palette tokens, so switching `data-theme` on <html>
    re-skins the whole app — charts included (they color-mix from --accent).
    Settings → Appearance writes the attribute; lib/settings.ts persists it.
    ====================================================================== */
-[data-theme="midnight"] {
-  --bg: #0d1117;
-  --bg-2: #11161f;
-  --panel: #151c26;
-  --panel-2: #182130;
-  --fg: #e6edf6;
-  --fg-soft: #c9d4e2;
-  --muted: #8b98a9;
-  --faint: #626d7d;
-  --rule: #232c39;
-  --rule-strong: #313d4e;
-  --margin: #4d7fbf;
-  --accent: #6aa6f0;
-  --accent-soft: #14202f;
-  --accent-border: #2b4a70;
-  --link: #7fc4e8;
-  --link-soft: #14232c;
-  --done-fg: #626d7d;
-  --claude: #a99af0;
-  --claude-bg: #1c1c33;
-  --claude-border: #33335c;
-}
 [data-theme="graphite"] {
   --bg: #121212;
   --bg-2: #171717;
@@ -248,45 +226,7 @@
   --link-soft: #1a2027;
   --done-fg: #6a6a6a;
 }
-[data-theme="forest"] {
-  --bg: #0e1410;
-  --bg-2: #121a14;
-  --panel: #162019;
-  --panel-2: #1a231c;
-  --fg: #e6efe6;
-  --fg-soft: #ccdccd;
-  --muted: #8aa08d;
-  --faint: #647a68;
-  --rule: #22301f;
-  --rule-strong: #2f4130;
-  --margin: #b06a4a;
-  --accent: #7fbf8f;
-  --accent-soft: #16241a;
-  --accent-border: #2c4733;
-  --link: #86c2b4;
-  --link-soft: #152520;
-  --done-fg: #647a68;
-}
-[data-theme="plum"] {
-  --bg: #14101a;
-  --bg-2: #191423;
-  --panel: #1e1828;
-  --panel-2: #221c2c;
-  --fg: #ece5f3;
-  --fg-soft: #d6cbe2;
-  --muted: #9a8dab;
-  --faint: #756787;
-  --rule: #2a2338;
-  --rule-strong: #3a3049;
-  --margin: #c06a86;
-  --accent: #c99bd8;
-  --accent-soft: #241a2c;
-  --accent-border: #453256;
-  --link: #99b0e8;
-  --link-soft: #1d2033;
-  --done-fg: #756787;
-}
-/* The one light theme — ink on cream paper. */
+/* Ink on cream paper. */
 [data-theme="parchment"] {
   color-scheme: light;
   --bg: #f4efe2;
@@ -322,44 +262,6 @@
   --err-bright: #9c3220;
   --err-bg: #fae8e3;
   --err-border: #edc9bf;
-}
-[data-theme="ocean"] {
-  --bg: #071316;
-  --bg-2: #0a1a1e;
-  --panel: #0d2126;
-  --panel-2: #10272d;
-  --fg: #e0f0f2;
-  --fg-soft: #c2dde0;
-  --muted: #7fa3a8;
-  --faint: #5d8086;
-  --rule: #163238;
-  --rule-strong: #22454d;
-  --margin: #cf7a5c;
-  --accent: #4fc3d9;
-  --accent-soft: #0d2a33;
-  --accent-border: #1f5566;
-  --link: #7fd4e8;
-  --link-soft: #0d2830;
-  --done-fg: #5d8086;
-}
-[data-theme="ember"] {
-  --bg: #17100d;
-  --bg-2: #1c1410;
-  --panel: #221913;
-  --panel-2: #291e17;
-  --fg: #f2e6dc;
-  --fg-soft: #dcccbf;
-  --muted: #a4897a;
-  --faint: #7d6558;
-  --rule: #2f231b;
-  --rule-strong: #422f24;
-  --margin: #c05a3e;
-  --accent: #ff8c5a;
-  --accent-soft: #2b1a12;
-  --accent-border: #5c3320;
-  --link: #e0a86a;
-  --link-soft: #2a2014;
-  --done-fg: #7d6558;
 }
 [data-theme="nord"] {
   --bg: #2e3440;
@@ -403,43 +305,6 @@
   --link-soft: #1c1c1c;
   --done-fg: #6b6b6b;
 }
-/* Light — aged paper, warm brown ink. */
-[data-theme="sepia"] {
-  color-scheme: light;
-  --bg: #f1e7d5;
-  --bg-2: #ece0cc;
-  --panel: #f8f1e3;
-  --panel-2: #efe5d3;
-  --fg: #3b2f21;
-  --fg-soft: #55452f;
-  --muted: #8a765c;
-  --faint: #a89678;
-  --rule: #ded0b8;
-  --rule-strong: #c8b494;
-  --margin: #a8503a;
-  --accent: #9c5f24;
-  --accent-soft: #f2e3cc;
-  --accent-border: #d9bc93;
-  --link: #35618c;
-  --link-soft: #e4edf5;
-  --done-fg: #a89678;
-  --age-warm: #a56b1f;
-  --age-hot: #b23c28;
-  --claude: #6b4bb0;
-  --claude-bg: #ece6f8;
-  --claude-border: #cfc0ee;
-  --ok: #3d7a3d;
-  --ok-bright: #2f6b2f;
-  --ok-bg: #e7f0e3;
-  --info: #35618c;
-  --info-bg: #e4edf5;
-  --amber: #9a7420;
-  --amber-bg: #f6ecd2;
-  --err: #a8503a;
-  --err-bright: #93412d;
-  --err-bg: #f8e6df;
-  --err-border: #e5c6bb;
-}
 /* Light — crisp white, clear blue. */
 [data-theme="daylight"] {
   color-scheme: light;
@@ -477,6 +342,7 @@
   --err-bg: #fbe9e5;
   --err-border: #f0cec5;
 }
+
 
 * {
   box-sizing: border-box;
@@ -644,14 +510,14 @@ h3.sub {
 }
 .btn-primary {
   background: var(--accent);
-  color: #1a1710;
+  color: var(--accent-ink);
   border-color: var(--accent);
   font-weight: 600;
 }
 .btn-primary:hover {
-  background: #e6c069;
-  color: #1a1710;
-  border-color: #e6c069;
+  background: color-mix(in oklab, var(--accent) 88%, var(--fg));
+  color: var(--accent-ink);
+  border-color: var(--accent);
 }
 .btn.small {
   font-size: 11px;
@@ -1965,31 +1831,43 @@ h3.sub {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(8, 7, 4, 0.6);
-  backdrop-filter: blur(2px);
+  background: rgba(5, 5, 5, 0.66);
+  backdrop-filter: blur(7px);
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 12vh 16px 16px;
+  padding: min(13vh, 132px) 16px 16px;
 }
 .cmdk {
   width: 100%;
-  max-width: 600px;
-  background: var(--panel-2);
+  max-width: 680px;
+  background: color-mix(in srgb, var(--panel-2) 94%, var(--bg));
   border: 1px solid var(--rule-strong);
-  border-radius: 12px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  border-radius: 16px;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.6);
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  max-height: 70vh;
+  max-height: min(74vh, 760px);
+}
+.cmdk-search-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 14px 0 18px;
+  border-bottom: 1px solid var(--rule);
+}
+.cmdk-search-row > svg {
+  flex: 0 0 auto;
+  color: var(--muted);
 }
 .cmdk-input {
-  font-size: 17px;
-  font-family: var(--serif);
-  padding: 16px 18px;
+  flex: 1;
+  min-width: 0;
+  font-size: 16px;
+  font-family: inherit;
+  padding: 18px 4px;
   border: none;
-  border-bottom: 1px solid var(--rule);
   outline: none;
   background: transparent;
   color: var(--fg);
@@ -1997,9 +1875,22 @@ h3.sub {
 .cmdk-input::placeholder {
   color: var(--faint);
 }
+.cmdk-clear {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.cmdk-clear:hover { color: var(--fg); background: var(--panel); }
 .cmdk-results {
   overflow-y: auto;
-  padding: 6px;
+  padding: 10px;
 }
 .cmdk-item {
   display: flex;
@@ -2009,13 +1900,91 @@ h3.sub {
   text-align: left;
   background: none;
   border: none;
-  border-radius: 7px;
-  padding: 9px 12px;
+  min-height: 44px;
+  border-radius: 9px;
+  padding: 10px 12px;
   cursor: pointer;
   color: var(--fg);
 }
 .cmdk-item.active {
   background: var(--panel);
+}
+.cmdk-agent-action {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 66px;
+  margin-bottom: 4px;
+  padding: 11px 13px;
+  border: 1px solid var(--rule);
+  border-radius: 11px;
+  background: var(--panel);
+  color: var(--fg);
+  cursor: pointer;
+  text-align: left;
+}
+.cmdk-agent-action:hover:not(:disabled) { border-color: var(--accent-border); background: var(--accent-soft); }
+.cmdk-agent-action:disabled { cursor: wait; opacity: .72; }
+.cmdk-agent-action > span:nth-child(2) { display: grid; gap: 2px; }
+.cmdk-agent-action small { color: var(--muted); font-size: 11px; }
+.cmdk-agent-action kbd { margin-left: auto; color: var(--muted); }
+.cmdk-action-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 9px;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.k-agent { background: var(--claude-bg); color: var(--claude); }
+.cmdk-agent-response {
+  margin: 2px 0 4px;
+  padding: 16px 17px 18px;
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.65;
+  background: var(--panel);
+  color: var(--fg-soft);
+}
+.cmdk-answer-heading {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 13px;
+  color: var(--fg);
+}
+.cmdk-answer-heading .cmdk-action-icon { width: 30px; height: 30px; border-radius: 8px; }
+.cmdk-agent-response .markdown { font-size: 13px; line-height: 1.65; }
+.cmdk-agent-response .markdown > :first-child { margin-top: 0; }
+.cmdk-agent-response .markdown > :last-child { margin-bottom: 0; }
+.cmdk-agent-error {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 3px 12px;
+  margin: 2px 0 4px;
+  padding: 13px 14px;
+  border: 1px solid color-mix(in srgb, var(--err-bright) 28%, var(--rule));
+  border-radius: 11px;
+  background: var(--err-bg);
+  color: var(--err-bright);
+}
+.cmdk-agent-error b { font-size: 12px; }
+.cmdk-agent-error span { grid-column: 1; font-size: 11px; color: var(--fg-soft); }
+.cmdk-agent-error button {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  align-self: center;
+  min-height: 34px;
+  padding: 0 11px;
+  border: 1px solid currentColor;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
 }
 .cmdk-kind {
   font-size: 10px;
@@ -2064,7 +2033,7 @@ h3.sub {
 .cmdk-foot {
   display: flex;
   gap: 16px;
-  padding: 8px 14px;
+  padding: 9px 16px;
   border-top: 1px solid var(--rule);
   font-size: 11px;
   color: var(--faint);
@@ -2820,7 +2789,7 @@ h3.sub {
 .cal-mini-cell.sel,
 .cal-mini-cell.sel.today {
   background: var(--accent);
-  color: #1a1710;
+  color: var(--accent-ink);
   font-weight: 600;
 }
 .cal-side-cals {
@@ -2998,7 +2967,7 @@ h3.sub {
 .cal-strip-day.sel .cal-strip-dn,
 .cal-strip-day.sel.today .cal-strip-dn {
   background: var(--accent);
-  color: #1a1710;
+  color: var(--accent-ink);
   font-weight: 600;
 }
 .cal-m-cals {
@@ -3328,7 +3297,6 @@ h3.sub {
    has no .dark class, so that block never activated and held greyscale colors.
    The notebook chart palette lives in :root above.) */
 
-
 /* ======================================================================
    Wiki view toggle + flat A–Z index
    NOTE: `.seg` above is a segmented *container*; these buttons reuse the
@@ -3575,6 +3543,33 @@ h3.sub {
 .set-row-title {
   font-size: 13.5px;
   color: var(--fg);
+}
+.set-section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+.connection-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: var(--muted);
+  font-size: 10px;
+}
+.connection-pill i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.connection-pill.connected {
+  color: var(--ok);
+  border-color: color-mix(in srgb, var(--ok) 35%, var(--rule));
 }
 .set-row-hint {
   margin-top: 3px;
@@ -3839,8 +3834,12 @@ h3.sub {
 .ov-slot > .card {
   flex: 1;
 }
-.ov-wide {
+.ov-wide,
+.ov-slot[data-span="full"] {
   grid-column: 1 / -1;
+}
+.ov-slot[data-span="2"] {
+  grid-column: span 2;
 }
 .mini-list {
   list-style: none;
@@ -3884,6 +3883,174 @@ h3.sub {
     padding-top: 0;
   }
 }
+
+
+/* ======================================================================
+   Widget board — Apple-home-screen-style edit mode (drag, resize, park)
+   ====================================================================== */
+.ov-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.wb-hint {
+  margin: 10px 0 -4px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+.ov-grid {
+  position: relative; /* drag math anchors to this box */
+}
+.wb-card {
+  position: relative;
+  height: 100%;
+}
+
+/* No jiggle — dragging is always available, so the board stays calm. */
+.ov-slot {
+  cursor: grab;
+  user-select: none;
+}
+.ov-grid.is-editing .ov-slot {
+  /* Customize mode also enables TOUCH dragging, which needs the browser to
+     stop treating a finger-drag on a card as a page scroll. */
+  touch-action: none;
+}
+.ov-slot.is-dragging {
+  cursor: grabbing;
+}
+.ov-slot.is-dragging .wb-card {
+  filter: drop-shadow(0 18px 34px rgba(0, 0, 0, 0.5));
+}
+.ov-slot.is-dragging .card {
+  border-color: var(--accent-border);
+}
+
+/* per-card controls */
+.wb-tools {
+  opacity: 0;
+  transition: opacity 0.14s ease;
+  position: absolute;
+  z-index: 3;
+  top: -9px;
+  left: -9px;
+  right: -9px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  pointer-events: none;
+}
+.wb-tools > * {
+  pointer-events: auto;
+}
+.ov-slot:hover .wb-tools,
+.ov-slot:focus-within .wb-tools,
+.ov-grid.is-editing .wb-tools {
+  opacity: 1;
+}
+.ov-slot.is-dragging .wb-tools {
+  opacity: 0;
+}
+.wb-remove {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid var(--rule-strong);
+  background: var(--panel-2);
+  color: var(--fg-soft);
+  font-size: 13px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+.wb-remove:hover {
+  color: var(--err-bright);
+  border-color: var(--err-border);
+}
+.wb-sizes {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 999px;
+  border: 1px solid var(--rule-strong);
+  background: var(--panel-2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+}
+.wb-size {
+  min-width: 22px;
+  height: 20px;
+  padding: 0 6px;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font: 600 10.5px/1 var(--font);
+  cursor: pointer;
+}
+.wb-size:hover { color: var(--fg); }
+.wb-size.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* parked-widget tray */
+.wb-tray {
+  margin: 18px 0 8px;
+  padding: 14px 16px;
+  border: 1px dashed var(--rule-strong);
+  border-radius: 12px;
+  background: var(--bg-2);
+}
+.wb-tray-head {
+  font-size: 10.5px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--faint);
+  margin-bottom: 10px;
+}
+.wb-tray-empty { font-size: 12.5px; }
+.wb-tray-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.wb-chip {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 13px 8px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  background: var(--panel);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+.wb-chip:hover {
+  border-color: var(--accent-border);
+}
+.wb-chip-plus {
+  color: var(--accent);
+  font-size: 13px;
+}
+.wb-chip-name {
+  display: block;
+  font-size: 13px;
+  color: var(--fg);
+}
+.wb-chip-hint {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+
 
 /* ======================================================================
    Milkdown / Crepe — follow the app theme
@@ -3941,3 +4108,349 @@ h3.sub {
   flex: none;
   margin-bottom: -2px;
 }
+
+/* Google sign-in on the login screen */
+.login-google {
+  display: flex;
+  justify-content: center;
+  margin-top: 22px;
+  min-height: 44px;
+}
+.login-or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0 -6px;
+  color: var(--faint);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.login-or::before,
+.login-or::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+
+/* Delete a task (inside the expanded row). Quiet until armed, then clearly
+   destructive — deliberate rather than a mis-click in a dense list. */
+.task-delete {
+  margin-left: auto;
+  padding: 3px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 11.5px;
+  cursor: pointer;
+  transition: color 0.14s ease, border-color 0.14s ease, background-color 0.14s ease;
+}
+.task-delete:hover {
+  color: var(--err-bright);
+  border-color: var(--err-border);
+}
+.task-delete.armed {
+  background: var(--err-bg);
+  border-color: var(--err-border);
+  color: var(--err-bright);
+  font-weight: 600;
+}
+
+/* ======================================================================
+   Docs folders — the card IS the folder: a flat, softly-rounded two-piece
+   shape (a tab behind a front panel) at exactly the document-card footprint.
+
+   Colour follows the app's existing language rather than inventing one:
+   --accent-soft is the tinted surface and --accent-border the edge, the same
+   pair used for every other accented surface. The tab is that surface stepped
+   toward --bg so it reads as sitting behind, with no gradient anywhere.
+
+   Built from pseudo-elements, not a stretched SVG, because the card width is
+   fluid and a scaled SVG would squash its corner radii into ellipses.
+   ====================================================================== */
+.folder-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 150px;
+  background: none;
+  border: none;
+  border-radius: 0;
+  /* clear the tab so the label sits on the front panel */
+  padding: 42px 20px 16px;
+  transition: transform 0.14s ease;
+}
+
+/* the tab — a back piece peeking above the front panel */
+.folder-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 46%;
+  height: 30px;
+  border-radius: 11px 11px 0 0;
+  background: color-mix(in oklab, var(--accent-soft) 74%, var(--bg));
+  border: 1px solid var(--accent-border);
+  border-bottom: none;
+  transition: border-color 0.15s ease;
+}
+
+/* the front panel */
+.folder-card::after {
+  content: "";
+  position: absolute;
+  inset: 16px 0 0 0;
+  border-radius: 13px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.folder-card:hover {
+  background: none;
+  transform: translateY(-2px);
+}
+.folder-card:hover::before,
+.folder-card:hover::after {
+  border-color: var(--accent);
+}
+.folder-card:active {
+  transform: translateY(0);
+}
+
+/* label + actions ride above both pieces */
+.folder-card > * {
+  position: relative;
+  z-index: 1;
+}
+.folder-card .doc-card-title {
+  margin-bottom: 2px;
+  color: var(--fg);
+}
+.folder-card .doc-card-meta {
+  color: var(--muted);
+}
+.folder-rename {
+  width: 100%;
+  padding: 4px 7px;
+  margin: -2px 0 2px;
+  background: var(--bg-2);
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+  color: var(--fg);
+  font-family: var(--serif);
+  font-size: 15px;
+}
+.folder-rename:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* actions stay out of the way until the card is hovered */
+.folder-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: 10px;
+  opacity: 0;
+  transition: opacity 0.14s ease;
+}
+.folder-card:hover .folder-actions,
+.folder-card:focus-within .folder-actions {
+  opacity: 1;
+}
+.folder-act {
+  padding: 3px 9px;
+  border: 1px solid var(--rule-strong);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--muted);
+  font: inherit;
+  font-size: 11px;
+  cursor: pointer;
+  transition: color 0.14s ease, border-color 0.14s ease;
+}
+.folder-act:hover {
+  color: var(--accent);
+  border-color: var(--accent-border);
+}
+.folder-act.danger:hover {
+  color: var(--err-bright);
+  border-color: var(--err-border);
+}
+
+/* drag + drop affordances */
+.doc-card[draggable="true"] {
+  cursor: grab;
+}
+.doc-card.is-dragging {
+  opacity: 0.45;
+  cursor: grabbing;
+}
+.folder-card.drop {
+  transform: translateY(-3px);
+}
+.folder-card.drop::before,
+.folder-card.drop::after {
+  border-color: var(--accent);
+}
+.folder-card.drop::after {
+  background: color-mix(in oklab, var(--accent) 16%, var(--accent-soft));
+  box-shadow: 0 0 0 1px var(--accent), 0 6px 16px rgba(0, 0, 0, 0.35);
+}
+.docs-crumb.drop {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--fg);
+}
+
+.docs-crumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  padding: 7px 14px;
+  border: 1px dashed var(--rule-strong);
+  border-radius: 9px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
+}
+.docs-crumb:hover {
+  color: var(--fg);
+  border-color: var(--rule-strong);
+}
+.docs-crumb-hint {
+  color: var(--accent);
+  font-size: 11px;
+}
+
+
+/* Quiet, low-saturation palettes with legible controls and status colors. */
+[data-theme="slate"] {
+  color-scheme: dark;
+  --bg: #17171f;
+  --bg-2: #1c1c27;
+  --panel: #222232;
+  --panel-2: #29293b;
+  --fg: #f1f0f6;
+  --fg-soft: #dcd9e7;
+  --muted: #a6a4b5;
+  --faint: #898798;
+  --rule: #353444;
+  --rule-strong: #504e64;
+  --margin: #756f8e;
+  --accent: #c2b7e8;
+  --accent-soft: #302d48;
+  --accent-border: #5c5680;
+  --link: #b9c4f2;
+  --link-soft: #2d3048;
+  --done-fg: #898798;
+  --accent-ink: #15141c;
+}
+[data-theme="dune"] {
+  color-scheme: dark;
+  --bg: #211f1c;
+  --bg-2: #26231f;
+  --panel: #2b2824;
+  --panel-2: #302d29;
+  --fg: #f1ede6;
+  --fg-soft: #ddd5c9;
+  --muted: #b2a89a;
+  --faint: #a09587;
+  --rule: #403a33;
+  --rule-strong: #655b4e;
+  --margin: #716354;
+  --accent: #ccb79a;
+  --accent-soft: #393229;
+  --accent-border: #77664f;
+  --link: #d2bda0;
+  --link-soft: #393229;
+  --done-fg: #a09587;
+  --accent-ink: #171a1f;
+}
+[data-theme="porcelain"] {
+  color-scheme: light;
+  --bg: #f7f8fa;
+  --bg-2: #f0f2f5;
+  --panel: #ffffff;
+  --panel-2: #eef1f5;
+  --fg: #242a32;
+  --fg-soft: #434c58;
+  --muted: #626e7c;
+  --faint: #697583;
+  --rule: #dce1e7;
+  --rule-strong: #aeb9c6;
+  --margin: #bec7d1;
+  --accent: #48617d;
+  --accent-soft: #e8edf4;
+  --accent-border: #9aaec4;
+  --link: #48617d;
+  --link-soft: #e8edf4;
+  --done-fg: #697583;
+  --accent-ink: #ffffff;
+  --age-warm: #826128;
+  --age-hot: #a44239;
+  --claude: #685783;
+  --claude-bg: #eeebf3;
+  --claude-border: #c9bfd8;
+  --ok: #3d694c;
+  --ok-bright: #30593e;
+  --ok-bg: #e5eee5;
+  --info: #48617d;
+  --info-bg: #e8edf4;
+  --amber: #826128;
+  --amber-bg: #f2ecdf;
+  --err: #a44239;
+  --err-bright: #923b33;
+  --err-bg: #f5e8e5;
+  --err-border: #d8b4ac;
+}
+[data-theme="sage"] {
+  color-scheme: light;
+  --bg: #f2f5f1;
+  --bg-2: #e9eee8;
+  --panel: #fafcf9;
+  --panel-2: #e8eee6;
+  --fg: #27322b;
+  --fg-soft: #435246;
+  --muted: #5d6b5f;
+  --faint: #69786b;
+  --rule: #d5dfd3;
+  --rule-strong: #a6b6a4;
+  --margin: #b3c2ae;
+  --accent: #45634f;
+  --accent-soft: #e3ece1;
+  --accent-border: #9db399;
+  --link: #45634f;
+  --link-soft: #e3ece1;
+  --done-fg: #69786b;
+  --accent-ink: #ffffff;
+  --age-warm: #826128;
+  --age-hot: #a44239;
+  --claude: #685783;
+  --claude-bg: #eeebf3;
+  --claude-border: #c9bfd8;
+  --ok: #3d694c;
+  --ok-bright: #30593e;
+  --ok-bg: #e5eee5;
+  --info: #48617d;
+  --info-bg: #e8edf4;
+  --amber: #826128;
+  --amber-bg: #f2ecdf;
+  --err: #a44239;
+  --err-bright: #923b33;
+  --err-bg: #f5e8e5;
+  --err-border: #d8b4ac;
+}
+[data-theme="parchment"], [data-theme="daylight"] { --accent-ink: #ffffff; }

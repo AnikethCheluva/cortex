@@ -16,13 +16,23 @@ import matter from "gray-matter";
 import { applyReview } from "../lib/srs/schedule";
 import { selectDaily } from "../lib/srs/select";
 import { ratingFromVerdict } from "../lib/srs/grade";
-import { buildCard, isDuplicate, passedGate, type Candidate, type Anno } from "../lib/srs/generate";
+import {
+  buildCard,
+  isDuplicate,
+  passedGate,
+  type Candidate,
+  type Anno,
+} from "../lib/srs/generate";
 import { renderQuizSection, parseQuizIds } from "../lib/srs/daysection";
 import { splitDayNote, combineDayNote } from "../lib/daynote";
 import { todayStem, todayISO, prettyISO, dailyDate } from "../lib/day";
 import type { CardBank, Review, Submission, Verdict } from "../lib/srs/types";
+import { appendLocalRecords } from "../lib/changelog/local";
+import { digest } from "../lib/changelog/records";
+import { BASELINE, type Baseline } from "../lib/changelog/git";
+import type { ChangeRecord, RecallRun } from "../lib/changelog/types";
 
-const ROOT = process.env.VAULT_PATH || path.resolve(process.cwd(), "..");
+const ROOT = process.env.VAULT_PATH || path.resolve(process.cwd(), "../examples/vault");
 const DAILY_CAP = Number(process.env.QUIZ_DAILY_CAP || "20");
 const abs = (rel: string) => path.join(ROOT, rel);
 
@@ -43,16 +53,20 @@ function parseJsonl<T>(text: string | null): T[] {
     .split("\n")
     .map((l) => l.trim())
     .filter(Boolean)
-    .flatMap((l) => {
+    .map((l, i) => {
       try {
-        return [JSON.parse(l) as T];
+        return JSON.parse(l) as T;
       } catch {
-        return [];
+        throw new Error(`Malformed recall JSONL at nonempty line ${i + 1}; inputs were preserved`);
       }
     });
 }
 
-type NewCardInput = Candidate & { source_file: string; topic: string; verification: Anno };
+type NewCardInput = Candidate & {
+  source_file: string;
+  topic: string;
+  verification: Anno;
+};
 type GradeInput = { card_id: string; submission_ts?: string; verdict: Verdict };
 
 /** The card ids served on the most recent earlier day that had a quiz. */
@@ -64,7 +78,7 @@ async function previousQuizIds(todayStemStr: string): Promise<string[]> {
       .map((f) => f.replace(/\.md$/i, ""));
     const dated = stems
       .map((s) => ({ s, iso: dailyDate(s).iso }))
-      .filter((x) => x.iso && x.s !== todayStemStr)
+      .filter((x) => x.iso && x.iso < dailyDate(todayStemStr).iso)
       .sort((a, b) => b.iso.localeCompare(a.iso));
     for (const { s } of dated.slice(0, 3)) {
       const raw = await readText(`sources/daily/${s}.md`);
@@ -82,9 +96,31 @@ async function main() {
   const nowISO = new Date().toISOString();
   const bankText = await readText("wiki/srs/cards.json");
   const bank: CardBank = bankText ? (JSON.parse(bankText) as CardBank) : {};
-  const submissions = parseJsonl<Submission>(await readText("wiki/srs/submissions.jsonl"));
-  const grades = parseJsonl<GradeInput>(await readText("wiki/srs/_grades.jsonl"));
-  const newcards = parseJsonl<NewCardInput>(await readText("wiki/srs/_newcards.jsonl"));
+  const submissions = parseJsonl<Submission>(
+    await readText("wiki/srs/submissions.jsonl"),
+  );
+  const grades = parseJsonl<GradeInput>(
+    await readText("wiki/srs/_grades.jsonl"),
+  );
+  const newcards = parseJsonl<NewCardInput>(
+    await readText("wiki/srs/_newcards.jsonl"),
+  );
+  // Validate every verdict before any persistence; typos must not become lapses.
+  for (const grade of grades) ratingFromVerdict(grade.verdict);
+  const recall: RecallRun = {
+    candidates: {
+      received: newcards.length,
+      rejected: 0,
+      duplicates: 0,
+      added: 0,
+      addedIds: [],
+      decisions: [],
+    },
+    grading: { received: grades.length, unmatched: 0, graded: 0, reviews: [] },
+    selection: { date: todayISO(), total: 0, new: 0, due: 0, cardIds: [] },
+    bankSize: 0,
+    pendingAnswers: 0,
+  };
 
   // 1. merge new cards (gated + deduped)
   const stems = Object.values(bank).map((c) => c.stem);
@@ -99,28 +135,86 @@ async function main() {
       bloom: nc.bloom,
       difficulty_target: nc.difficulty_target,
     };
-    if (!passedGate(cand, nc.verification).passed || isDuplicate(cand.stem, stems)) continue;
-    const card = buildCard(cand, { source_file: nc.source_file, topic: nc.topic }, nc.verification, nowISO);
-    if (bank[card.id]) continue;
+    if (!passedGate(cand, nc.verification).passed) {
+      recall.candidates.rejected++;
+      recall.candidates.decisions.push({
+        stem: cand.stem,
+        outcome: "rejected",
+        reason: "verification gate",
+      });
+      continue;
+    }
+    if (isDuplicate(cand.stem, stems)) {
+      recall.candidates.duplicates++;
+      recall.candidates.decisions.push({
+        stem: cand.stem,
+        outcome: "duplicate",
+        reason: "matching stem",
+      });
+      continue;
+    }
+    const card = buildCard(
+      cand,
+      { source_file: nc.source_file, topic: nc.topic },
+      nc.verification,
+      nowISO,
+    );
+    if (bank[card.id]) {
+      recall.candidates.duplicates++;
+      recall.candidates.decisions.push({
+        stem: cand.stem,
+        outcome: "duplicate",
+        reason: "existing card id",
+        cardId: card.id,
+      });
+      continue;
+    }
     bank[card.id] = card;
     stems.push(cand.stem);
     added++;
+    recall.candidates.addedIds.push(card.id);
+    recall.candidates.decisions.push({
+      stem: cand.stem,
+      outcome: "added",
+      cardId: card.id,
+    });
   }
 
   // 2. apply grades → FSRS advance + review log
   const processed = new Set<Submission>();
   const newReviews: Review[] = [];
   let graded = 0;
-  for (const g of grades) {
+  for (const g of [...grades].sort((a, b) => (a.submission_ts ?? "").localeCompare(b.submission_ts ?? ""))) {
     const card = bank[g.card_id];
-    if (!card) continue;
+    if (!card) {
+      recall.grading.unmatched++;
+      continue;
+    }
     const matches = submissions
-      .filter((s) => s.card_id === g.card_id && !processed.has(s) && (!g.submission_ts || s.ts === g.submission_ts))
+      .filter(
+        (s) =>
+          s.card_id === g.card_id &&
+          !processed.has(s) &&
+          (!g.submission_ts || s.ts === g.submission_ts),
+      )
       .sort((a, b) => a.ts.localeCompare(b.ts));
     const sub = matches[matches.length - 1]; // most recent matching answer
-    if (!sub) continue;
+    if (!sub) {
+      recall.grading.unmatched++;
+      continue;
+    }
     const rating = ratingFromVerdict(g.verdict);
     const next = applyReview(card.srs, rating, sub.ts); // grade AS OF when it was answered
+    recall.grading.reviews.push({
+      cardId: card.id,
+      answeredAt: sub.ts,
+      verdict: g.verdict,
+      rating,
+      dueBefore: card.srs.due,
+      dueAfter: next.due,
+      stateBefore: card.srs.state,
+      stateAfter: next.state,
+    });
     newReviews.push({
       card_id: g.card_id,
       ts: sub.ts,
@@ -136,7 +230,7 @@ async function main() {
       reps: next.reps,
       state: next.state,
       duration_ms: sub.duration_ms,
-      grader_model: "claude-ingest",
+      grader_model: "cortex-ingest",
     });
     card.srs = next;
     processed.add(sub);
@@ -145,15 +239,28 @@ async function main() {
 
   // persist: reviews (append), submissions (drop processed), cards (projection)
   if (newReviews.length) {
-    const prev = ((await readText("wiki/srs/reviews.jsonl")) ?? "").replace(/\s*$/, "");
-    const body = [prev, ...newReviews.map((r) => JSON.stringify(r))].filter(Boolean).join("\n");
+    const prev = ((await readText("wiki/srs/reviews.jsonl")) ?? "").replace(
+      /\s*$/,
+      "",
+    );
+    const body = [prev, ...newReviews.map((r) => JSON.stringify(r))]
+      .filter(Boolean)
+      .join("\n");
     await writeText("wiki/srs/reviews.jsonl", body + "\n");
   }
   const remaining = submissions.filter((s) => !processed.has(s));
   if (remaining.length !== submissions.length) {
-    await writeText("wiki/srs/submissions.jsonl", remaining.map((s) => JSON.stringify(s)).join("\n") + (remaining.length ? "\n" : ""));
+    await writeText(
+      "wiki/srs/submissions.jsonl",
+      remaining.map((s) => JSON.stringify(s)).join("\n") +
+        (remaining.length ? "\n" : ""),
+    );
   }
-  if (added || graded) await writeText("wiki/srs/cards.json", JSON.stringify(bank, null, 2) + "\n");
+  if (added || graded)
+    await writeText(
+      "wiki/srs/cards.json",
+      JSON.stringify(bank, null, 2) + "\n",
+    );
 
   // 3. select today's set → write into today's daily note.
   // Pass yesterday's ids so today can't hand back the same questions: a New card
@@ -161,17 +268,58 @@ async function main() {
   // static and an unrotated pick repeats verbatim.
   const stem = todayStem();
   const prevIds = await previousQuizIds(stem);
-  const selected = selectDaily(Object.values(bank), {
+  let selected = selectDaily(Object.values(bank), {
     max: DAILY_CAP,
     now: nowISO,
     exclude: prevIds,
   });
   const daily = await readText(`sources/daily/${stem}.md`);
+  // A second ingest must not replace questions the user has already started.
+  const existingQuiz = daily ? splitDayNote(matter(daily).content).quiz : "";
+  const existingIds = parseQuizIds(existingQuiz);
+  if (existingIds.length) selected = existingIds.map(id => bank[id]).filter(card => card && !card.suspended);
   const fm =
-    daily?.match(/^(---\n[\s\S]*?\n---\s*\n)/)?.[1] ?? `---\ntype: daily\nCreated: ${todayISO()}\n---\n`;
-  const { written, voice } = splitDayNote(daily ? matter(daily).content.trim() : "");
-  const quiz = selected.length ? renderQuizSection(selected, prettyISO(todayISO())) : "";
-  await writeText(`sources/daily/${stem}.md`, fm + "\n" + combineDayNote(written, voice, quiz));
+    daily?.match(/^(---\n[\s\S]*?\n---\s*\n)/)?.[1] ??
+    `---\ntype: daily\nCreated: ${todayISO()}\n---\n`;
+  const { written, voice } = splitDayNote(
+    daily ? matter(daily).content.trim() : "",
+  );
+  const quiz = selected.length
+    ? renderQuizSection(selected, prettyISO(todayISO()))
+    : "";
+  await writeText(
+    `sources/daily/${stem}.md`,
+    fm.trimEnd() + "\n\n" + combineDayNote(written, voice, quiz),
+  );
+
+  // Emit the numbers computed by this run, never inferred from a later diff.
+  recall.candidates.added = added;
+  recall.grading.graded = graded;
+  recall.bankSize = Object.keys(bank).length;
+  recall.pendingAnswers = remaining.length;
+  recall.selection = {
+    date: todayISO(),
+    total: selected.length,
+    new: selected.filter((card) => card.srs.state === 0).length,
+    due: selected.filter((card) => card.srs.state !== 0).length,
+    cardIds: selected.map((card) => card.id),
+  };
+  const baselineRaw = await readText(BASELINE);
+  const runId = baselineRaw
+    ? (JSON.parse(baselineRaw) as Baseline).runId
+    : `srs-${todayISO()}-${digest(JSON.stringify(recall))}`;
+  const record: ChangeRecord = {
+    id: digest(`${runId}:recall:${JSON.stringify(recall)}`),
+    timestamp: nowISO,
+    source: "srs",
+    runId,
+    surface: "recall",
+    action: "run",
+    path: "wiki/srs/",
+    title: "Recall run",
+    recall,
+  };
+  await appendLocalRecords(ROOT, [record]);
 
   // 4. clear the handoff files
   await writeText("wiki/srs/_grades.jsonl", "");
@@ -197,7 +345,9 @@ async function main() {
     ? selected.filter((c) => prevIds.includes(c.id)).length
     : 0;
   if (repeat && repeat === selected.length) {
-    console.warn(`⚠ today's ${repeat} question(s) all repeat the previous day's set.`);
+    console.warn(
+      `⚠ today's ${repeat} question(s) all repeat the previous day's set.`,
+    );
   }
 }
 

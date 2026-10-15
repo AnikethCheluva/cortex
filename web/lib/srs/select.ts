@@ -14,7 +14,8 @@ export type SelectOpts = {
 
 /** Days since the epoch for a date — the rotation key for new-card selection. */
 function dayNumber(nowISO: string): number {
-  const t = Date.parse(`${nowISO.slice(0, 10)}T00:00:00Z`);
+  const localDay = new Intl.DateTimeFormat("en-CA", { timeZone: "America/New_York", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(nowISO));
+  const t = Date.parse(`${localDay}T00:00:00Z`);
   return Number.isNaN(t) ? 0 : Math.floor(t / 86_400_000);
 }
 
@@ -25,26 +26,24 @@ export function interleave(cards: Card[]): Card[] {
     const k = c.topic || "misc";
     (buckets.get(k) ?? buckets.set(k, []).get(k)!).push(c);
   }
-  const queues = [...buckets.values()];
   const out: Card[] = [];
-  let progress = true;
-  while (progress) {
-    progress = false;
-    for (const q of queues) {
-      const next = q.shift();
-      if (next) {
-        out.push(next);
-        progress = true;
-      }
-    }
+  let previous = "";
+  while (buckets.size) {
+    const ranked = [...buckets.entries()].sort((a, b) => b[1].length - a[1].length);
+    const [topic, queue] = ranked.find(([key]) => key !== previous) ?? ranked[0];
+    out.push(queue.shift()!);
+    previous = topic;
+    if (!queue.length) buckets.delete(topic);
   }
   return out;
 }
 
 export function selectDaily(cards: Card[], opts: SelectOpts = {}): Card[] {
   const now = opts.now ?? new Date().toISOString();
-  const max = opts.max ?? 20;
-  const maxNew = opts.maxNew ?? 8;
+  const limit = (value: number | undefined, fallback: number) =>
+    value === undefined || !Number.isFinite(value) ? fallback : Math.max(0, Math.floor(value));
+  const max = limit(opts.max, 20);
+  const maxNew = limit(opts.maxNew, 8);
 
   const active = cards.filter((c) => !c.suspended);
   const fresh = active.filter((c) => c.srs.state === State.New);
@@ -67,13 +66,8 @@ export function selectDaily(cards: Card[], opts: SelectOpts = {}): Card[] {
   // forget matters more than new material, and a backlog therefore gates new
   // cards rather than piling on top of them.
   //
-  // The one refinement: a due card served YESTERDAY and left unanswered steps
-  // aside for a day if there is other material to show. Re-serving something you
-  // just skipped teaches nothing, and when the answer→grade loop stalls it is
-  // what makes every daily note come out identical. The card stays due and
-  // returns; it simply doesn't monopolise the quiz.
-  const dueFresh = due.filter((c) => !skip.has(c.id));
-  const dueRepeat = due.filter((c) => skip.has(c.id));
+  // Rotation applies only to new material. An unanswered due review keeps its
+  // urgency; yesterday's appearance must never let new cards displace it.
 
   // New cards rotate by date rather than always taking the head of the pool.
   // A New card only leaves the New state once an answer is graded, so while
@@ -96,9 +90,8 @@ export function selectDaily(cards: Card[], opts: SelectOpts = {}): Card[] {
     }
   };
 
-  take(dueFresh, max); // 1. reviews you haven't just seen
-  take(rotatedNew, Math.min(maxNew, Math.max(0, max - picked.length))); // 2. new material
-  take(dueRepeat, max - picked.length); // 3. yesterday's unanswered, to top up
+  take(due, max);
+  take(interleave(rotatedNew), Math.min(maxNew, Math.max(0, max - picked.length)));
 
   return interleave(picked);
 }

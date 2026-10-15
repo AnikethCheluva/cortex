@@ -65,6 +65,37 @@ export const saveNote = (slug: string, input: { title: string; body: string }) =
     body: JSON.stringify(input),
   }).then(json<{ ok: boolean; slug: string }>);
 
+export const moveNote = (slug: string, folder: string) =>
+  fetch(`/api/notes/${encodeURIComponent(slug)}`, {
+    method: "PATCH",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ folder }),
+  }).then(json<{ ok: true; slug: string; folder: string }>);
+
+export type NoteFolderDTO = { id: string; name: string; created: string };
+
+export const listFolders = () =>
+  fetch("/api/notes/folders", { cache: "no-store" }).then(json<{ folders: NoteFolderDTO[] }>);
+
+export const createFolder = (name: string) =>
+  fetch("/api/notes/folders", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ name }),
+  }).then(json<NoteFolderDTO>);
+
+export const renameFolder = (id: string, name: string) =>
+  fetch(`/api/notes/folders/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ name }),
+  }).then(json<NoteFolderDTO>);
+
+export const deleteFolder = (id: string) =>
+  fetch(`/api/notes/folders/${encodeURIComponent(id)}`, { method: "DELETE" }).then(
+    json<{ ok: true; freed: number }>,
+  );
+
 export const deleteNote = (slug: string) =>
   fetch(`/api/notes/${encodeURIComponent(slug)}`, { method: "DELETE" }).then(
     json<{ ok: boolean }>,
@@ -76,6 +107,7 @@ export const createTask = (input: {
   priority?: string;
   due_date?: string;
   page_slug?: string;
+  estimate_minutes?: number;
 }) =>
   fetch("/api/tasks", {
     method: "POST",
@@ -85,13 +117,39 @@ export const createTask = (input: {
 
 export const updateTask = (
   id: string,
-  patch: Partial<Pick<Task, "status" | "priority" | "body">>,
+  patch: Partial<Pick<Task, "status" | "priority" | "body" | "due_date" | "title" | "project" | "estimate_minutes" | "timebox_start">>,
 ) =>
   fetch(`/api/tasks/${encodeURIComponent(id)}`, {
     method: "PATCH",
     headers: { "content-type": "application/json" },
     body: JSON.stringify(patch),
   }).then(json<Task>);
+
+export type AgentEstimate = { taskId: string; minutes: number };
+export const estimateTaskDurations = (tasks: Task[]) =>
+  fetch("/api/agent/estimate", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      tasks: tasks
+        .filter((task) => task.status !== "done")
+        .slice(0, 30)
+        .map((task) => ({
+          id: task.id,
+          title: task.title,
+          notes: task.body.slice(0, 1200),
+          priority: task.priority,
+          due_date: task.due_date,
+          project: task.project,
+          current_estimate_minutes: task.estimate_minutes,
+        })),
+    }),
+  }).then(json<{ estimates: AgentEstimate[] }>);
+
+export const deleteTask = (id: string) =>
+  fetch(`/api/tasks/${encodeURIComponent(id)}`, { method: "DELETE" }).then(
+    json<{ ok: true; id: string }>,
+  );
 
 // ---- recall quiz (keyless: submit reveals the answer; the ingest grades) ----
 export type QuizReveal = { referenceAnswer: string; requiredPoints: string[]; sourceFile: string };

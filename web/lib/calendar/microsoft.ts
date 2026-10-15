@@ -6,6 +6,7 @@
 // origin as a redirect URI). `common` authority covers personal + work accounts.
 import { PublicClientApplication, type AuthenticationResult } from "@azure/msal-browser";
 import type { CalEvent, NewEvent } from "./types";
+import { findMeetingUrl, plainEventText } from "./meetings";
 
 const CLIENT_ID = process.env.NEXT_PUBLIC_MS_CLIENT_ID || "";
 const SCOPES = ["Calendars.ReadWrite", "User.Read"];
@@ -14,6 +15,7 @@ const GRAPH = "https://graph.microsoft.com/v1.0";
 export const microsoftConfigured = () => Boolean(CLIENT_ID);
 
 let init: Promise<PublicClientApplication> | null = null;
+let readyApp: PublicClientApplication | null = null;
 
 function app(): Promise<PublicClientApplication> {
   if (!init) {
@@ -25,7 +27,7 @@ function app(): Promise<PublicClientApplication> {
       },
       cache: { cacheLocation: "localStorage" },
     });
-    init = pca.initialize().then(() => pca);
+    init = pca.initialize().then(() => { readyApp = pca; return pca; }).catch(error => { init = null; throw error; });
   }
   return init;
 }
@@ -35,9 +37,10 @@ async function account(p?: PublicClientApplication) {
   return pca.getAllAccounts()[0] ?? null;
 }
 
-export async function microsoftSignIn(): Promise<void> {
-  const p = await app();
-  await p.loginPopup({ scopes: SCOPES });
+export async function microsoftPrepareSignIn(): Promise<void> { await app(); }
+
+export function microsoftSignIn(): Promise<void> {
+  return (readyApp ? readyApp.loginPopup({ scopes: SCOPES }) : app().then(p => p.loginPopup({ scopes: SCOPES }))).then(() => {});
 }
 
 export async function microsoftSignOut(): Promise<void> {
@@ -99,12 +102,16 @@ export async function microsoftListEvents(startISO: string, endISO: string): Pro
     end: e.isAllDay ? String(e.end?.dateTime).slice(0, 10) : asUtc(String(e.end?.dateTime)),
     allDay: Boolean(e.isAllDay),
     location: e.location?.displayName || undefined,
-    description: e.bodyPreview || undefined,
+    description: plainEventText(e.body?.content || e.bodyPreview),
+    meetingUrl: findMeetingUrl([e.onlineMeeting?.joinUrl, e.onlineMeetingUrl], [e.location?.displayName, e.body?.content, e.bodyPreview]),
+    recurring: Boolean(e.seriesMasterId || e.recurrence),
+    organizer: e.organizer?.emailAddress?.name || e.organizer?.emailAddress?.address,
+    attendees: e.attendees?.map((attendee: { emailAddress?: { name?: string; address?: string }; status?: { response?: string } }) => ({ name: attendee.emailAddress?.name || attendee.emailAddress?.address || "Guest", response: attendee.status?.response })),
     link: e.webLink || undefined,
   }));
 }
 
-export async function microsoftCreate(ev: NewEvent): Promise<void> {
+export async function microsoftCreate(ev: NewEvent): Promise<string> {
   const strip = (iso: string) => iso.replace(/\.\d+Z?$/, "").replace(/Z$/, ""); // Graph wants naive + timeZone
   const body = ev.allDay
     ? {
@@ -122,7 +129,8 @@ export async function microsoftCreate(ev: NewEvent): Promise<void> {
         start: { dateTime: strip(ev.start), timeZone: "UTC" },
         end: { dateTime: strip(ev.end), timeZone: "UTC" },
       };
-  await graph(`/me/events`, { method: "POST", body: JSON.stringify(body) });
+  const created = await graph<{ id: string }>(`/me/events`, { method: "POST", body: JSON.stringify(body) });
+  return created.id;
 }
 
 export async function microsoftDelete(id: string): Promise<void> {

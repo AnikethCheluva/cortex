@@ -6,6 +6,7 @@ import type { GradeResult, Rating, Verdict } from "./types";
 
 /** Map a verdict to an FSRS grade (1 Again · 2 Hard · 3 Good). */
 export function ratingFromVerdict(v: Verdict): Rating {
+  if (!["correct", "partial", "incorrect"].includes(v)) throw new Error("Invalid recall verdict");
   return v === "correct" ? 3 : v === "partial" ? 2 : 1;
 }
 

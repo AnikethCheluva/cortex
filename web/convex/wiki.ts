@@ -6,6 +6,8 @@ import { query } from "./_generated/server";
 export const getVault = query({
   args: {},
   handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity || !(process.env.ALLOWED_EMAILS || "").split(",").map(s => s.trim().toLowerCase()).includes(String(identity.email || "").toLowerCase())) throw new Error("Unauthorized");
     const [pages, tasks, dailyNotes, logEntries, meta] = await Promise.all([
       ctx.db.query("pages").collect(),
       ctx.db.query("tasks").collect(),

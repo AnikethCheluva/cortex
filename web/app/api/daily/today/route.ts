@@ -1,3 +1,4 @@
+import { readAuthorized } from "@/lib/apiauth";
 import { NextResponse } from "next/server";
 import matter from "gray-matter";
 import { readVaultFile, writeVaultFile } from "@/lib/storage";
@@ -16,7 +17,8 @@ function relFor(stem: string) {
 
 // GET today's note (live from the vault). If it doesn't exist yet, hand back the
 // blank template so the editor opens to a fresh day.
-export async function GET() {
+export async function GET(req: Request) {
+  if (!readAuthorized(req)) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const stem = todayStem();
   const iso = todayISO();
   const file = await readVaultFile(relFor(stem));

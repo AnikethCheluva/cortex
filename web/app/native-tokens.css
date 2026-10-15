@@ -1,0 +1,70 @@
+/* Apple HIG adaptation. Sources and implementation choices: ../design/apple-native.json */
+:root {
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  /* Legacy heading/prose tokens share the same system family as the UI. */
+  --serif: var(--font);
+  --native-radius-xs: 8px;
+  --native-radius-sm: 12px;
+  --native-radius-md: 16px;
+  --native-radius-lg: 20px;
+  --native-radius-sheet: 28px;
+  --native-radius-pill: 999px;
+  --native-fast: 120ms;
+  --native-standard: 220ms;
+  --native-sheet: 360ms;
+  --native-ease: cubic-bezier(.2, .7, .2, 1);
+  --native-spring: cubic-bezier(.22, 1, .36, 1);
+  --motion-fast: var(--native-fast);
+  --motion-enter: var(--native-standard);
+  --ease-out: var(--native-ease);
+  --workspace-radius: var(--native-radius-lg);
+  --native-material: color-mix(in srgb, var(--bg-2) 82%, transparent);
+  --native-toolbar: color-mix(in srgb, var(--bg) 84%, transparent);
+  --native-hover: color-mix(in srgb, var(--fg) 6%, transparent);
+  --native-selection: color-mix(in srgb, var(--accent) 17%, var(--panel));
+  --native-shadow: 0 1px 2px #0000000a, 0 5px 20px #00000008;
+  --native-floating-shadow: 0 0 0 1px #00000008, 0 12px 40px #00000024, 0 2px 8px #00000014;
+  --native-action: var(--accent);
+  --native-on-action: var(--bg);
+  --system-green: #34c759;
+}
+/* Palette IDs remain stable for existing saved preferences. */
+:root:not([data-theme]), [data-theme="slate"] {
+  color-scheme: dark;
+  --bg: #1c1c1e; --bg-2: #1c1c1e; --panel: #2c2c2e; --panel-2: #3a3a3c;
+  --fg: #ffffff; --fg-soft: #e5e5ea; --muted: #aeaeb2; --faint: #aeaeb2;
+  --rule: #ffffff12; --rule-strong: #ffffff23;
+  --accent: #0091ff; --accent-soft: #0091ff1f; --accent-border: #0091ff66;
+  --link: #0091ff; --link-soft: #0091ff1f; --done-fg: #aeaeb2;
+  --native-action: #1e6ef4; --native-on-action: #fff;
+  --system-green: #30d158;
+  --ok: #30d158; --ok-bright: #30d158; --ok-bg: #30d1581f;
+  --err: #ff4245; --err-bright: #ff6165; --err-bg: #ff42451f; --err-border: #ff424566;
+  --info: #0091ff; --info-bg: #0091ff1f; --amber: #ff9230; --amber-bg: #ff92301f;
+  --claude: #db34f2; --claude-bg: #db34f21f; --claude-border: #db34f266;
+  --native-shadow: 0 1px 2px #0002, 0 5px 20px #00000010;
+  --native-floating-shadow: 0 0 0 1px #ffffff12, 0 16px 48px #0006, 0 2px 8px #0003;
+}
+[data-theme="porcelain"] {
+  color-scheme: light;
+  --bg: #f2f2f7; --bg-2: #e5e5ea; --panel: #ffffff; --panel-2: #f2f2f7;
+  --fg: #000000; --fg-soft: #48484a; --muted: #6c6c70; --faint: #6c6c70;
+  --rule: #0000000f; --rule-strong: #00000024;
+  --accent: #0088ff; --accent-soft: #0088ff14; --accent-border: #0088ff55;
+  --link: #1e6ef4; --link-soft: #0088ff14; --done-fg: #6c6c70;
+  --native-action: #1e6ef4; --native-on-action: #fff;
+  --system-green: #34c759;
+  --ok: #008932; --ok-bright: #008932; --ok-bg: #34c75914;
+  --err: #e9152d; --err-bright: #e9152d; --err-bg: #ff383c14; --err-border: #ff383c55;
+  --info: #1e6ef4; --info-bg: #0088ff14;
+}
+@media (prefers-contrast: more) {
+  :root:not([data-theme]), [data-theme="slate"] {
+    --accent: #5cb8ff; --link: #5cb8ff; --ok: #4ad968; --err: #ff6165;
+  }
+  [data-theme="porcelain"] { --accent: #1e6ef4; --link: #1e6ef4; --ok: #008932; --err: #e9152d; }
+}
+/* Native continuous corners where the browser supports them. */
+@supports (animation-timing-function: linear(0, 1)) {
+  :root { --native-spring: linear(0, .025, .105, .225, .37, .52, .66, .775, .865, .93, .973, .997, 1.008, 1.01, 1.007, 1.003, 1); }
+}

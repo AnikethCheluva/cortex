@@ -1,10 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import "./globals.css";
+import { THEME_BOOT } from "@/lib/themes";
+import "./cortex.css";
 import { ConvexClientProvider } from "./ConvexClientProvider";
+import { MotionProvider } from "./MotionProvider";
 
 export const metadata: Metadata = {
   title: "Cortex",
-  description: "A second brain for your notes.",
+  description: "Notes, tasks, and calendar.",
   manifest: "/manifest.webmanifest",
   // Make "Add to Home Screen" on iOS open full-screen like a native app.
   appleWebApp: {
@@ -20,27 +22,25 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#14130d",
+  themeColor: "#1c1c1e",
   width: "device-width",
   initialScale: 1,
   // let the page paint under the notch / home indicator; we pad with safe-area.
   viewportFit: "cover",
 };
 
-// Apply the saved theme before first paint, so switching away from the default
-// doesn't flash the default palette on every load. Mirrors lib/settings.ts.
-const THEME_BOOT = `(function(){try{var s=localStorage.getItem('cortex:settings');if(!s)return;var t=JSON.parse(s).theme;if(t&&t!=='notebook')document.documentElement.setAttribute('data-theme',t);}catch(e){}})()`;
-
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
       </head>
       <body>
-        <ConvexClientProvider>{children}</ConvexClientProvider>
+        <MotionProvider>
+          <ConvexClientProvider>{children}</ConvexClientProvider>
+        </MotionProvider>
       </body>
     </html>
   );

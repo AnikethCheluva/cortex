@@ -1,10 +1,11 @@
+import { readAuthorized } from "@/lib/apiauth";
 import { NextResponse } from "next/server";
 import matter from "gray-matter";
 import { readVaultFile } from "@/lib/storage";
-import { todayStem } from "@/lib/day";
+import { todayStem, todayISO } from "@/lib/day";
 import { splitDayNote } from "@/lib/daynote";
 import { parseQuizIds } from "@/lib/srs/daysection";
-import { readCards, readSubmissions } from "@/lib/srs/store";
+import { readCards, readSubmissions, readReviews } from "@/lib/srs/store";
 import { selectDaily } from "@/lib/srs/select";
 import type { Card, PublicCard } from "@/lib/srs/types";
 
@@ -23,13 +24,15 @@ const publicOf = (c: Card): PublicCard => ({
 
 // GET → today's quiz questions (answer/rubric stripped). Normally the ingest
 // writes the day's selection into today's daily note behind <!-- srs:quiz -->.
-// If it hasn't run yet (or ever), we FALL BACK to selecting due + new cards live
-// from the card bank — the same logic the ingest uses — so there is always a
-// quiz to do as long as the bank has cards. The ingest's curated block wins
-// whenever it exists.
-export async function GET() {
+// If it hasn't run yet (or ever), FALL BACK to selecting due + new cards live
+// from the bank — the same selectDaily logic the ingest uses — so there is
+// always a quiz to do as long as the bank has cards. Unanswered/overdue cards
+// resurface here automatically (they're never penalized); the ingest's curated
+// block still wins whenever it exists.
+export async function GET(req: Request) {
+  if (!readAuthorized(req)) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const stem = todayStem();
-  const [bank, subs] = await Promise.all([readCards(), readSubmissions()]);
+  const [bank, subs, reviews] = await Promise.all([readCards(), readSubmissions(), readReviews()]);
   const f = await readVaultFile(`sources/daily/${stem}.md`);
   const body = f ? matter(f.content).content : "";
   let ids = parseQuizIds(splitDayNote(body).quiz);
@@ -39,9 +42,17 @@ export async function GET() {
     ids = selectDaily(Object.values(bank), { max: cap }).map((c) => c.id);
     generated = ids.length > 0;
   }
-  const cards = ids.map((id) => bank[id]).filter((c): c is Card => !!c).map(publicOf);
+  const cards = ids.map((id) => bank[id]).filter((c): c is Card => !!c && !c.suspended).map(publicOf);
   // Already-answered-today cards (still in the ungraded queue) so the UI can skip them.
   const pending = new Set(subs.map((s) => s.card_id));
+  // Ingest consumes submissions. Already-graded answers must still count as
+  // completed today, otherwise rerunning ingest resurrects a finished quiz.
+  const date = todayISO();
+  const localDate = new Intl.DateTimeFormat("en-CA", {timeZone:"America/New_York", year:"numeric", month:"2-digit", day:"2-digit"});
+  for (const review of reviews) {
+    const answered = new Date(review.ts);
+    if (Number.isFinite(answered.getTime()) && localDate.format(answered) === date) pending.add(review.card_id);
+  }
   const submittedIds = ids.filter((id) => pending.has(id));
   return NextResponse.json(
     { stem, cards, submittedIds, generated },

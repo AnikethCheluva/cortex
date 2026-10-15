@@ -1,3 +1,4 @@
+import { readAuthorized } from "@/lib/apiauth";
 import { NextResponse } from "next/server";
 import { readVaultFile, listVaultDir } from "@/lib/storage";
 import { parseTask } from "@/lib/parse";
@@ -21,7 +22,8 @@ const PRIO = { high: 0, medium: 1, low: 2 } as const;
 
 // GET → a single glanceable snapshot for widgets / menu bar / any frontend:
 // today's note status, daily streak, task stats, top open tasks, and counts.
-export async function GET() {
+export async function GET(req: Request) {
+  if (!readAuthorized(req)) return Response.json({ error: "Unauthorized" }, { status: 401 });
   const today = todayISO();
 
   const [taskStems, dailyStems, pageStems, todayFile] = await Promise.all([

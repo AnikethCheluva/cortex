@@ -1,10 +1,10 @@
 // Date helpers shared by server + client. "Today" is always resolved in
-// America/New_York (the app's configured timezone) — NOT the server's clock. Vercel runs
+// the configured workspace timezone — NOT the server's clock. Vercel runs
 // in UTC, so without this the daily note rolls to "tomorrow" every evening EST.
 // The vault names daily notes "M-D-YY.md" (no zero-padding) with a
 // `Created: YYYY-MM-DD` frontmatter, so we expose both forms.
 
-const TZ = "America/New_York";
+const TZ = process.env.NEXT_PUBLIC_TIME_ZONE || "America/New_York";
 
 /** {y, m, day} for a Date as seen in New York (defaults to now). */
 function nyYMD(d: Date = new Date()): { y: number; m: number; day: number } {
