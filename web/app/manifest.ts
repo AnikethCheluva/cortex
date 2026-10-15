@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 // Web app manifest — makes the site installable as a standalone app (the
 // home-screen "app" experience). iOS uses the apple-icon + apple meta tags;
-// Android/Chrome use this manifest. Colors match the default Slate theme.
+// Android/Chrome use this manifest. Install icons always use Apple Dark, independent of the selected app theme.
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
@@ -12,14 +12,12 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     scope: "/",
     display: "standalone",
-    background_color: "#181b20",
-    theme_color: "#181b20",
+    background_color: "#1c1c1e",
+    theme_color: "#1c1c1e",
     icons: [
-      // SVG scales crisply to any size (Dock/Launchpad); PNG fallback for
-      // browsers that want a raster icon at install time.
-      { src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" },
-      { src: "/apple-icon", sizes: "180x180", type: "image/png", purpose: "any" },
-      { src: "/icon.svg", sizes: "512x512", type: "image/svg+xml", purpose: "maskable" },
+      { src: "/icons/cortex-apple-dark-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+      { src: "/icons/cortex-apple-dark-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      { src: "/icons/cortex-apple-dark-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
     ],
   };
 }
